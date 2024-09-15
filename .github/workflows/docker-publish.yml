@@ -22,7 +22,7 @@ jobs:
         context: .
         file: ./Dockerfile.prod
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/sandra-server:prod
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/sandra-client:prod
 
     - name: Build and push development Docker image
       uses: docker/build-push-action@v4
@@ -30,4 +30,4 @@ jobs:
         context: .
         file: ./Dockerfile.dev
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/sandra-server:dev
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/sandra-client:dev
