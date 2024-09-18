@@ -24,6 +24,8 @@ const useModalStore = create((set) => ({
     set((state) => {
       const newState = { showRegisterModal: false }
 
+      console.log("closeRegisterModal", state)
+
       return newState
     })
   },

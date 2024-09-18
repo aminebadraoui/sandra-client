@@ -6,19 +6,18 @@ import useModalStore from '../../state/modalStore'
 import { useForm } from "react-hook-form";
 import OAuthForm from "./OAuthForm";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signUpSchema } from "../../forms/signupSchema";
+import { signinSchema } from "../../forms/signinSchema";
 import { capitalizeFirstLetter } from "../utils/stringUtils";
 
 
-const RegisterModal = () => {
+const SigninModal = () => {
     // Hooks
     const onRegisterModalClose = () => {
-        console.log("onRegisterModalClose")
-        useModalStore.getState().closeRegisterModal()
+        useModalStore.getState().closeLoginModal()
     }
 
     const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(signUpSchema),
+        resolver: zodResolver(signinSchema),
         mode: "onChange"
     })
 
@@ -26,10 +25,9 @@ const RegisterModal = () => {
 
     const [isSuccess, setIsSuccess] = useState(false)
     const [isError, setIsError] = useState(false)
-    const [firstName, setFirstName] = useState("")
-    const [email, setEmail] = useState("")
 
-    console.log(useForm())
+
+
 
     // Handlers 
 
@@ -39,22 +37,9 @@ const RegisterModal = () => {
         setIsError(false)
     }
 
-    const handleResendVerificationEmail = () => {
-        console.log("handleResendVerificationEmail called")
-    }
+
 
     const onSubmit = (data) => {
-        // Transform the data
-        const transformedData = {
-            ...data,
-            firstName: capitalizeFirstLetter(data.firstName),
-            lastName: capitalizeFirstLetter(data.lastName),
-        };
-
-        console.log(transformedData);
-        setFirstName(transformedData.firstName);
-        setEmail(transformedData.email);
-
 
         setIsSuccess(true);
 
@@ -78,16 +63,6 @@ const RegisterModal = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
                 <StyledInput
-                    {...register("firstName")}
-                    placeholder="First Name"
-                    errors={errors.firstName} />
-
-                <StyledInput
-                    {...register("lastName")}
-                    placeholder="Last Name"
-                    errors={errors.lastName} />
-
-                <StyledInput
                     {...register("email")}
                     placeholder="Email"
                     errors={errors.email} />
@@ -97,12 +72,6 @@ const RegisterModal = () => {
                     placeholder="Password"
                     type="password"
                     errors={errors.password} />
-
-                <StyledInput
-                    {...register("confirmPassword")}
-                    placeholder="Confirm Password"
-                    type="password"
-                    errors={errors.confirmPassword} />
 
                 <div className="m-4">
                     <StyledButton
@@ -128,18 +97,6 @@ const RegisterModal = () => {
 
     )
 
-    const verificationForm = (
-        <div className="text-center">
-            <h1 className="p-4"> You're almost there {firstName} !</h1>
-            <p className="p-4"> We sent an email to <span className="font-bold"> {email} </span>, just click the link in that email to complete the signup.
-                if you don't see it you may need to check your spam folder.
-            </p>
-            <p className="p-4"> Still can't find email? No problem.</p>
-            <div className="p-4">
-                <StyledButton title={"Resend verification email"} onClick={handleResendVerificationEmail}></StyledButton>
-            </div>
-        </div>
-    )
 
     return (
         <Modal title={"Sign up"} onClose={onRegisterModalClose}>
@@ -147,11 +104,9 @@ const RegisterModal = () => {
                 {!isSuccess && !isError && form}
 
                 {isError && errorForm}
-
-                {isSuccess && verificationForm}
             </div>
         </Modal>
     );
 }
 
-export default RegisterModal;
+export default SigninModal;

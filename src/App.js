@@ -2,9 +2,10 @@
 import './App.css';
 import Navbar from './components/features/Navbar';
 
-import LoginModal from './components/features/LoginModal';
+
 import RegisterModal from './components/features/RegisterModal';
 import useModalStore from './state/modalStore';
+import SigninModal from './components/features/SigninModal';
 
 
 
@@ -15,8 +16,8 @@ function App() {
 
   return (
     <div >
-      {showLoginModal && <LoginModal />}
-      {true && <RegisterModal />}
+      {showLoginModal && <SigninModal />}
+      {showRegisterModal && <RegisterModal />}
 
       <Navbar />
       <div className='pt-[50px]' >
