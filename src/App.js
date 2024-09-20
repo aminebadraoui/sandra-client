@@ -8,6 +8,7 @@ import UserHomePage from './components/pages/UserHomePage';
 import AdminDashboard from './components/pages/AdminDashboard';
 import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
+import AddServiceListingForm from './components/forms/AddServiceListingForm';
 
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
@@ -29,6 +30,14 @@ function App() {
     return (
       <Routes>
         <Route path="/" element={user ? <UserHomePage /> : <div>Content for non-logged in users</div>} />
+        <Route
+          path="/add-service-listing"
+          element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/add-event-listing"
+          element={user && user.role === "organizer" ? <div>Add Event Listing Page</div> : <Navigate to="/" />}
+        />
         <Route
           path="/manage-listing"
           element={user ? <div>Manage Listing Page (User: {user.email})</div> : <Navigate to="/" />}
