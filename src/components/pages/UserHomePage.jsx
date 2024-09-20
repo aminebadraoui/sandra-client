@@ -12,7 +12,10 @@ const UserHomePage = () => {
 
     return (
         <div className="p-4">
-            <h1 className="text-8xl font-bold mb-4">Welcome, {user.firstName}!</h1>
+            <div className="py-4 flex items-center ">
+                <h1 className="text-8xl  font-bold">Welcome, {user.firstName}!</h1>
+            </div>
+
             {user.role === "serviceProvider" ? (
                 <ServiceProviderHomePage />
             ) : (

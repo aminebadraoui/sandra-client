@@ -2,7 +2,7 @@ import React from 'react';
 import StyledButton from '../reusable/StyledButton';
 
 const Section = ({ title, children }) => (
-    <section className="mt-16 w-full">
+    <section className="mt-8 w-full">
         <h2 className="text-3xl font-semibold mb-8">{title}</h2>
         {children}
 

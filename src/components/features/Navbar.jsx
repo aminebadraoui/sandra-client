@@ -12,13 +12,16 @@ const Navbar = () => {
     return (
         <div className="bg-white fixed z-50 w-full border-b border-[1px] shadow-md h-auto py-2">
             <div className="flex flex-row justify-between items-center h-full px-16">
-                <Logo />
+                <Link to="/" >
+                    <Logo />
+                </Link>
+
 
                 <div className="flex flex-row gap-4 items-center">
                     {user && (
                         <>
                             {user.isAdmin && (
-                                <Link to="/admin-dashboard" className="text-blue-600 hover:text-blue-800">
+                                <Link to="/admin" className="text-blue-600 hover:text-blue-800">
                                     Admin Dashboard
                                 </Link>
                             )}
