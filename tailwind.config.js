@@ -5,7 +5,11 @@ module.exports = {
     "./public/index.html",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        '8xl': '4rem'
+      }
+    },
   },
   plugins: [],
 }

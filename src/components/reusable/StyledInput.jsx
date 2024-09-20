@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const StyledInput = React.forwardRef(({ placeholder, type, onChange, errors, ...props }, ref) => {
     const [hasText, setHasText] = useState(false)
 
-    console.log(props)
+
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
 

@@ -8,6 +8,7 @@ import OAuthForm from "./OAuthForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signinSchema } from "../../forms/signinSchema";
 import { capitalizeFirstLetter } from "../utils/stringUtils";
+import useUserStore from "../../state/userStore";
 
 
 const SigninModal = () => {
@@ -15,6 +16,8 @@ const SigninModal = () => {
     const onRegisterModalClose = () => {
         useModalStore.getState().closeLoginModal()
     }
+
+    const { setUser } = useUserStore()
 
     const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(signinSchema),
@@ -39,19 +42,37 @@ const SigninModal = () => {
 
 
 
-    const onSubmit = (data) => {
+    const onSubmit = async ({ email, password }) => {
+        console.log("onSubmit login")
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/signin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-        setIsSuccess(true);
+            console.log(" signin request")
 
-        // Submit data
+            if (response.ok) {
+                const data = await response.json();
+                // Store the token in localStorage or a state management solution
+                localStorage.setItem('token', data.token);
+                setUser(data.user)
+                console.log("success login")
+                return { success: true };
 
-        // on error
+            } else {
+                console.log("error login")
 
-        // show error on form 
-
-        // on success
-
-        // show verification
+                const errorData = await response.json();
+                return { success: false, message: errorData.message };
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            return { success: false, message: 'An error occurred during login' };
+        }
     }
 
     const form = (

@@ -8,7 +8,7 @@ import OAuthForm from "./OAuthForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "../../forms/signupSchema";
 import { capitalizeFirstLetter } from "../utils/stringUtils";
-
+import RoleSelector from "./RoleSelector";
 
 const RegisterModal = () => {
     // Hooks
@@ -17,7 +17,7 @@ const RegisterModal = () => {
         useModalStore.getState().closeRegisterModal()
     }
 
-    const { handleSubmit, register, formState: { errors, isSubmitting } } = useForm({
+    const { handleSubmit, register, formState: { errors, isSubmitting }, setValue } = useForm({
         resolver: zodResolver(signUpSchema),
         mode: "onChange"
     })
@@ -43,8 +43,7 @@ const RegisterModal = () => {
         console.log("handleResendVerificationEmail called")
     }
 
-    const onSubmit = (data) => {
-        // Transform the data
+    const onSubmit = async (data) => {
         const transformedData = {
             ...data,
             firstName: capitalizeFirstLetter(data.firstName),
@@ -55,18 +54,26 @@ const RegisterModal = () => {
         setFirstName(transformedData.firstName);
         setEmail(transformedData.email);
 
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(transformedData),
+            });
 
-        setIsSuccess(true);
-
-        // Submit data
-
-        // on error
-
-        // show error on form 
-
-        // on success
-
-        // show verification
+            if (response.ok) {
+                setIsSuccess(true);
+            } else {
+                const errorData = await response.json();
+                console.error('Signup failed:', errorData.message);
+                setIsError(true);
+            }
+        } catch (error) {
+            console.error('Error during signup:', error);
+            setIsError(true);
+        }
     }
 
     const form = (
@@ -74,6 +81,11 @@ const RegisterModal = () => {
             <div>
                 <h1 className="font-bold"> Welcome To Sandra </h1>
             </div>
+
+            <div className="w-full flex items-center justify-center m-2">
+                <RoleSelector onRoleSelect={(role) => setValue("role", role)} />
+            </div>
+
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
@@ -103,6 +115,8 @@ const RegisterModal = () => {
                     placeholder="Confirm Password"
                     type="password"
                     errors={errors.confirmPassword} />
+
+
 
                 <div className="m-4">
                     <StyledButton
