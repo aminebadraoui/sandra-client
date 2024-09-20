@@ -44,6 +44,7 @@ const SigninModal = () => {
 
     const onSubmit = async ({ email, password }) => {
         console.log("onSubmit login")
+        console.log("env:", process.env.REACT_APP_API_URL)
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/signin`, {
                 method: 'POST',
