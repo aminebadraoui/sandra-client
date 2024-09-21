@@ -1,22 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaExclamationCircle } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaExclamationCircle, FaStar } from 'react-icons/fa';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { useDropzone } from 'react-dropzone';
+import { FaCloudUploadAlt, FaSpinner } from 'react-icons/fa';
 
 const steps = [
     'Your idea',
     'Location',
     'Category',
     'Tag',
-    'Pricing',
-    'Availability',
+    'Pricing Types',
+    'Pricing Details',
     'Main image',
     'Additional images',
     'Review'
 ];
 
+const pricingTypes = [
+    { value: 'one-time', label: 'One-Time' },
+    { value: 'per-hour', label: 'Per Hour' },
+    { value: 'per-day', label: 'Per Day' }
+];
+
+const currencies = ['USD', 'EUR', 'GBP', 'JPY']; // Add more as needed
+
 const AddServiceListingForm = () => {
     const [currentStep, setCurrentStep] = useState(0);
+    const [furthestStep, setFurthestStep] = useState(0);
     const [categories, setCategories] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
     const methods = useForm({
@@ -26,14 +39,56 @@ const AddServiceListingForm = () => {
             location: '',
             category: '',
             tag: '',
-            mainPricingType: 'one-time',
-            mainPricingAmount: '',
-            availability: [],
+            pricingTypes: [],
+            pricing: {},
+            pricingCurrency: '',
             mainImage: '',
             additionalImages: [],
         }
     });
     const navigate = useNavigate();
+
+    const [isStepValid, setIsStepValid] = useState(false);
+
+    useEffect(() => {
+        validateStep();
+    }, [currentStep, methods.watch()]);
+
+    const validateStep = async () => {
+        switch (currentStep) {
+            case 0: // Your idea
+                const { title, description } = methods.getValues();
+                setIsStepValid(title.trim() !== '' && description.trim() !== '');
+                break;
+            case 1: // Location
+                setIsStepValid(methods.getValues('location').trim() !== '');
+                break;
+            case 2: // Category
+                setIsStepValid(methods.getValues('category') !== '');
+                break;
+            case 3: // Tag
+                setIsStepValid(methods.getValues('tag') !== '');
+                break;
+            case 4: // Pricing Types
+                setIsStepValid(methods.getValues('pricingTypes').length > 0);
+                break;
+            case 5: // Pricing Details
+                const { pricing, pricingCurrency, pricingTypes } = methods.getValues();
+                setIsStepValid(
+                    pricingCurrency !== '' &&
+                    pricingTypes.every(type => pricing[type]?.amount > 0)
+                );
+                break;
+            case 6: // Main image
+                setIsStepValid(methods.getValues('mainImage') !== '');
+                break;
+            case 7: // Additional images (always valid)
+                setIsStepValid(true);
+                break;
+            default:
+                setIsStepValid(false);
+        }
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -60,22 +115,84 @@ const AddServiceListingForm = () => {
         fetchCategories();
     }, []);
 
-    const handleNext = async () => {
-        const isOptionalStep = currentStep === 5 || currentStep === 7; // Availability and Additional images
+    const ImageUpload = ({ onUpload, multiple = false }) => {
+        const [isUploading, setIsUploading] = useState(false);
 
-        if (isOptionalStep) {
-            setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-            return;
+        const onDrop = useCallback(async (acceptedFiles) => {
+            setIsUploading(true);
+            const uploadedUrls = await Promise.all(acceptedFiles.map(uploadImage));
+            onUpload(multiple ? uploadedUrls : uploadedUrls[0]);
+            setIsUploading(false);
+        }, [onUpload, multiple]);
+
+        const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: 'image/*', multiple });
+
+        return (
+            <div className="space-y-4">
+                <div
+                    {...getRootProps()}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragActive ? 'border-rose-500 bg-rose-50' : 'border-gray-300 hover:border-rose-500'
+                        }`}
+                >
+                    <input {...getInputProps()} />
+                    <FaCloudUploadAlt className="mx-auto text-5xl text-gray-400 mb-4" />
+                    {isDragActive ? (
+                        <p className="text-rose-500">Drop the image(s) here ...</p>
+                    ) : (
+                        <p className="text-gray-500">Drag 'n' drop image(s) here, or click to select files</p>
+                    )}
+                </div>
+                {isUploading && (
+                    <div className="w-full h-64 bg-gray-200 animate-pulse rounded-lg"></div>
+                )}
+            </div>
+        );
+    };
+
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'vdlfsgok');
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/dbwefnkfe/image/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            return data.secure_url;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            return null;
         }
+    };
 
-        const isValid = await methods.trigger();
-        if (isValid) {
-            setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+    const handleImageUpload = async (e, field) => {
+        const file = e.target.files[0];
+        if (file) {
+            const imageUrl = await uploadImage(file);
+            if (imageUrl) {
+                methods.setValue(field, imageUrl);
+            }
+        }
+    };
+
+    const handleNext = async () => {
+        if (isStepValid) {
+            const nextStep = Math.min(currentStep + 1, steps.length - 1);
+            setCurrentStep(nextStep);
+            setFurthestStep(Math.max(furthestStep, nextStep));
         }
     };
 
     const handlePrev = () => {
         setCurrentStep((prev) => Math.max(prev - 1, 0));
+    };
+
+    const goToStep = (stepIndex) => {
+        if (stepIndex <= furthestStep) {
+            setCurrentStep(stepIndex);
+        }
     };
 
     const onSubmit = (data) => {
@@ -120,6 +237,19 @@ const AddServiceListingForm = () => {
                             />
                             {methods.formState.errors.description && renderErrorMessage(methods.formState.errors.description)}
                         </div>
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
             case 1:
@@ -160,6 +290,19 @@ const AddServiceListingForm = () => {
                                 ))}
                             </ul>
                         )}
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
             case 2: // Category
@@ -185,6 +328,19 @@ const AddServiceListingForm = () => {
                             ))}
                         </div>
                         {methods.formState.errors.category && renderErrorMessage(methods.formState.errors.category)}
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
 
@@ -228,165 +384,207 @@ const AddServiceListingForm = () => {
                             </div>
                         )}
                         {methods.formState.errors.tag && renderErrorMessage(methods.formState.errors.tag)}
-                    </div>
-                );
-            case 4:
-                return (
-                    <div className="space-y-4 max-w-2xl mx-auto">
-                        <h2 className="text-2xl font-bold text-center">Pricing</h2>
-                        {/* Main pricing option */}
-                        <div className="space-y-2">
-                            <select {...methods.register('mainPricingType')} className="w-full p-2 border rounded">
-                                <option value="one-time">One-Time</option>
-                                <option value="per-hour">Per Hour</option>
-                                <option value="per-day">Per Day</option>
-                            </select>
-                            <input
-                                type="number"
-                                {...methods.register('mainPricingAmount', { required: 'Price is required' })}
-                                placeholder="Price"
-                                className="w-full p-2 border rounded"
-                            />
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
                         </div>
-                        {/* Additional pricing options */}
-                        {methods.watch('additionalPricing')?.map((_, index) => (
-                            <div key={index} className="space-y-2">
-                                <select {...methods.register(`additionalPricing.${index}.type`)} className="w-full p-2 border rounded">
-                                    <option value="one-time">One-Time</option>
-                                    <option value="per-hour">Per Hour</option>
-                                    <option value="per-day">Per Day</option>
-                                </select>
-                                <input
-                                    type="number"
-                                    {...methods.register(`additionalPricing.${index}.amount`)}
-                                    placeholder="Price"
-                                    className="w-full p-2 border rounded"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        const currentPricing = methods.getValues('additionalPricing');
-                                        methods.setValue('additionalPricing', currentPricing.filter((_, i) => i !== index));
-                                    }}
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const currentPricing = methods.getValues('additionalPricing') || [];
-                                methods.setValue('additionalPricing', [...currentPricing, { type: 'one-time', amount: '' }]);
-                            }}
-                            className="bg-rose-500 text-white px-2 py-1 rounded"
-                        >
-                            Add Pricing Option
-                        </button>
                     </div>
                 );
-            case 5: // Availability (optional)
+            case 4: // Pricing Types
                 return (
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold text-center">Availability (Optional)</h2>
-                        <input
-                            type="date"
-                            {...methods.register('availability')}
-                            className="w-full p-2 border rounded"
-                        />
+                        <h2 className="text-2xl font-bold text-center">Pricing Types</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            {pricingTypes.map((type) => (
+                                <button
+                                    key={type.value}
+                                    type="button"
+                                    onClick={() => {
+                                        const currentTypes = methods.getValues('pricingTypes') || [];
+                                        const updatedTypes = currentTypes.includes(type.value)
+                                            ? currentTypes.filter(t => t !== type.value)
+                                            : [...currentTypes, type.value];
+                                        methods.setValue('pricingTypes', updatedTypes);
+                                    }}
+                                    className={`p-4 border rounded ${methods.watch('pricingTypes')?.includes(type.value)
+                                        ? 'bg-rose-500 text-white'
+                                        : 'bg-white'
+                                        }`}
+                                >
+                                    {type.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
-            case 6: // Main image (required)
+            case 5: // Pricing Details
+                const selectedTypes = methods.watch('pricingTypes') || [];
+                return (
+                    <div className="space-y-4">
+                        <h2 className="text-2xl font-bold text-center">Pricing Details</h2>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">Currency</label>
+                            <select
+                                {...methods.register('pricingCurrency', { required: 'Currency is required' })}
+                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-rose-500 focus:border-rose-500 sm:text-sm rounded-md"
+                            >
+                                <option value="">Select currency</option>
+                                {currencies.map(currency => (
+                                    <option key={currency} value={currency}>{currency}</option>
+                                ))}
+                            </select>
+                        </div>
+                        {selectedTypes.map((type) => (
+                            <div key={type} className="space-y-2">
+                                <h3 className="font-semibold">{pricingTypes.find(t => t.value === type).label}</h3>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">{methods.watch('pricingCurrency')}</span>
+                                    <input
+                                        type="number"
+                                        {...methods.register(`pricing.${type}.amount`, { required: 'Price is required' })}
+                                        placeholder="Price"
+                                        className="flex-grow p-2 border rounded"
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                );
+            case 6: // Main image
                 return (
                     <div className="space-y-4">
                         <h2 className="text-2xl font-bold text-center">Main Image</h2>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            {...methods.register('mainImage', { required: 'Main image is required' })}
-                            onChange={() => { }}
+                        <ImageUpload
+                            onUpload={(url) => methods.setValue('mainImage', url)}
                         />
-                        {methods.formState.errors.mainImage && renderErrorMessage(methods.formState.errors.mainImage)}
                         {methods.watch('mainImage') && (
-                            <img src={methods.watch('mainImage')} alt="Main" className="w-full h-64 object-cover" />
+                            <img src={methods.watch('mainImage')} alt="Main" className="w-full h-64 object-cover rounded-lg" />
                         )}
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
-            case 7: // Additional images (optional)
+
+            case 7: // Additional images
                 return (
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold text-center">Additional Images (Optional)</h2>
-                        <input
-                            type="file"
-                            accept="image/*"
+                        <h2 className="text-2xl font-bold text-center">Additional Images</h2>
+                        <ImageUpload
+                            onUpload={(urls) => {
+                                const currentImages = methods.getValues('additionalImages') || [];
+                                methods.setValue('additionalImages', [...currentImages, ...urls]);
+                            }}
                             multiple
-                            onChange={() => { }}
                         />
                         <div className="grid grid-cols-3 gap-4">
                             {methods.watch('additionalImages')?.map((img, index) => (
-                                <img key={index} src={img} alt={`Additional ${index}`} className="w-full h-32 object-cover" />
+                                <img key={index} src={img} alt={`Additional ${index}`} className="w-full h-32 object-cover rounded-lg" />
                             ))}
+                        </div>
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600"
+                            >
+                                Next
+                            </button>
                         </div>
                     </div>
                 );
-            case 8:
+
+            case 8: // Review
+                const formData = methods.getValues();
+                const reviewSelectedCategory = categories.find(cat => cat.id === formData.category);
+                const selectedTag = reviewSelectedCategory?.tags.find(tag => tag.id === formData.tag);
+
                 return (
                     <div className="space-y-4 max-w-2xl mx-auto">
                         <h2 className="text-2xl font-bold text-center">Review Your Listing</h2>
-                        <div>
-                            <h3 className="font-bold">Title:</h3>
-                            <p>{methods.getValues('title')}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Description:</h3>
-                            <p>{methods.getValues('description')}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Location:</h3>
-                            <p>{methods.getValues('location')}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Category:</h3>
-                            <p>{categories.find(c => c.id === methods.getValues('category'))?.name}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Tag:</h3>
-                            <p>{categories.find(c => c.id === methods.getValues('category'))?.tags.find(t => t.id === methods.getValues('tag'))?.name}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Main Pricing:</h3>
-                            <p>{`${methods.getValues('mainPricingType')} - $${methods.getValues('mainPricingAmount')}`}</p>
-                        </div>
-                        {methods.getValues('additionalPricing')?.map((pricing, index) => (
-                            <div key={index}>
-                                <h3 className="font-bold">Additional Pricing {index + 1}:</h3>
-                                <p>{`${pricing.type} - $${pricing.amount}`}</p>
-                            </div>
-                        ))}
-                        <div>
-                            <h3 className="font-bold">Availability:</h3>
-                            <p>{methods.getValues('availability') || 'Not set'}</p>
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Main Image:</h3>
-                            <img src={methods.getValues('mainImage')} alt="Main" className="w-full h-64 object-cover" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold">Additional Images:</h3>
-                            <div className="grid grid-cols-3 gap-4">
-                                {methods.getValues('additionalImages')?.map((img, index) => (
-                                    <img key={index} src={img} alt={`Additional ${index}`} className="w-full h-32 object-cover" />
+                        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                            <Carousel showThumbs={false}>
+                                <div>
+                                    <img src={formData.mainImage} alt="Main" className="w-full h-64 object-cover" />
+                                </div>
+                                {formData.additionalImages?.map((img, index) => (
+                                    <div key={index}>
+                                        <img src={img} alt={`Additional ${index}`} className="w-full h-64 object-cover" />
+                                    </div>
                                 ))}
+                            </Carousel>
+                            <div className="p-6">
+                                <h3 className="text-2xl font-bold mb-2">{formData.title}</h3>
+                                <p className="text-gray-600 mb-4">{formData.location}</p>
+
+                                <p className="text-gray-700 mb-4">{formData.description}</p>
+                                <div className="mb-4">
+                                    <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mr-2">
+                                        {selectedTag?.name}
+                                    </span>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="font-semibold">Price:</p>
+                                    {Object.entries(formData.pricing).map(([type, { amount, currency }]) => (
+                                        <p key={type}>{`${pricingTypes.find(t => t.value === type).label} - ${currency} ${amount}`}</p>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                        <button
-                            type="button"
-                            onClick={methods.handleSubmit(onSubmit)}
-                            className="w-full px-4 py-2 bg-green-500 text-white rounded"
-                        >
-                            Submit Listing
-                        </button>
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={methods.handleSubmit(onSubmit)}
+                                className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Submit Listing
+                            </button>
+                        </div>
                     </div>
                 );
             default:
@@ -394,6 +592,19 @@ const AddServiceListingForm = () => {
                     <div className="space-y-4">
                         <h2 className="text-2xl font-bold">{steps[currentStep]}</h2>
                         <p className="text-gray-600">This step is not implemented yet.</p>
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={currentStep === furthestStep && !isStepValid}
+                                className={`px-6 py-2 rounded ${currentStep < furthestStep || isStepValid
+                                    ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 );
         }
@@ -407,9 +618,15 @@ const AddServiceListingForm = () => {
                     <h2 className="text-xl font-bold mb-4">Submit your experience</h2>
                     <ul>
                         {steps.map((step, index) => (
-                            <li key={index} className="flex items-center mb-3">
-                                <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${index === currentStep ? 'bg-rose-500 text-white' : 'bg-gray-300'}`}>
-                                    {index < currentStep ? '✓' : ''}
+                            <li
+                                key={index}
+                                className={`flex items-center mb-3 ${index <= furthestStep ? 'cursor-pointer' : ''}`}
+                                onClick={() => goToStep(index)}
+                            >
+                                <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${index === currentStep ? 'bg-rose-500 text-white' :
+                                    index <= furthestStep ? 'bg-green-500 text-white' : 'bg-gray-300'
+                                    }`}>
+                                    {index < furthestStep ? '✓' : ''}
                                 </div>
                                 <span className={index === currentStep ? 'font-semibold' : ''}>{step}</span>
                             </li>
@@ -430,8 +647,8 @@ const AddServiceListingForm = () => {
                         </button>
                         <button
                             onClick={handleNext}
-                            disabled={currentStep === steps.length - 1}
-                            className={`p-2 rounded-full ${currentStep === steps.length - 1 ? 'bg-gray-200 text-gray-400' : 'bg-rose-500 text-white'}`}
+                            disabled={currentStep === steps.length - 1 || (currentStep === furthestStep && !isStepValid)}
+                            className={`p-2 rounded-full ${currentStep === steps.length - 1 || (currentStep === furthestStep && !isStepValid) ? 'bg-gray-200 text-gray-400' : 'bg-rose-500 text-white'}`}
                         >
                             <FaChevronRight className="w-6 h-6" />
                         </button>
