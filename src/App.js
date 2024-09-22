@@ -10,7 +10,7 @@ import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
 import AddServiceListingForm from './components/forms/serviceListing/AddServiceListingForm';
 import ManageListingsPage from './components/pages/ManageListingsPage';
-
+import EditServiceListingForm from './components/forms/serviceListing/EditServiceListingForm';
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
   const showRegisterModal = useModalStore(state => state.showRegisterModal)
@@ -39,6 +39,7 @@ function App() {
           path="/add-event-listings"
           element={user && user.role === "organizer" ? <div>Add Event Listing Page</div> : <Navigate to="/" />}
         />
+        <Route path="/edit-listing/:id" element={<EditServiceListingForm />} />
         <Route
           path="/manage-listings/*"
           element={user ? <ManageListingsPage /> : <Navigate to="/" />}

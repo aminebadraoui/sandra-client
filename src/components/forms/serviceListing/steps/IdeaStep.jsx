@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FaExclamationCircle } from 'react-icons/fa';
 
-const IdeaStep = () => {
+const IdeaStep = ({ revisionComments }) => {
     const { register, formState: { errors } } = useFormContext();
 
     const renderErrorMessage = (error) => {
@@ -17,6 +17,13 @@ const IdeaStep = () => {
     return (
         <div className="space-y-4">
             <h2 className="text-2xl font-bold text-center">Your Idea</h2>
+
+            {revisionComments && (
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                    <p className="font-bold">Revision Comments:</p>
+                    <p>{revisionComments}</p>
+                </div>
+            )}
             <div>
                 <input
                     {...register('title', { required: 'Title is required' })}
@@ -33,6 +40,13 @@ const IdeaStep = () => {
                 />
                 {errors.description && renderErrorMessage(errors.description)}
             </div>
+
+            {revisionComments?.idea && (
+                <div className="mt-4 p-4 bg-yellow-100 rounded">
+                    <p className="font-semibold">Admin comment:</p>
+                    <p>{revisionComments.idea}</p>
+                </div>
+            )}
         </div>
     );
 };

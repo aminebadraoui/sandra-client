@@ -1,7 +1,7 @@
 import React from 'react';
 import Carousel from '../containers/Carousel.jsx';
 import StyledButton from '../reusable/StyledButton';
-import CarouselItem from '../features/CarouselItem';
+import CarouselItem from '../features/ListingItem.jsx';
 import Section from '../containers/Section.jsx';
 
 

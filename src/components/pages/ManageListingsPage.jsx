@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ManageListingsSidebar from '../features/ManageListingsSidebar';
-import Carousel from "../containers/Carousel";
-import CarouselItem from '../features/CarouselItem';
+import EditServiceListingForm from '../forms/serviceListing/EditServiceListingForm';
+import ListingItem from '../features/ListingItem';
 import LoadingSpinner from '../reusable/LoadingSpinner';
 
 const ListingsSection = ({ title, listings, isLoading }) => {
@@ -29,29 +29,31 @@ const ListingsSection = ({ title, listings, isLoading }) => {
     return (
         <div className="mt-8">
             <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-            <Carousel
-                items={listings.map(listing => ({
-                    id: listing.id,
-                    title: listing.title,
-                    image: listing.mainImage,
-                    description: listing.description,
-                    tag: listing.tag || 'Uncategorized',
-                    isServiceListing: true,
-                    user: listing.user ? listing.user.firstName : 'Unknown User',
-                    pricing: listing.pricing,
-                    status: listing.status
-                }))}
-                renderItem={(item) => (
-                    <CarouselItem {...item}>
-                        <p className="font-semibold text-gray-800 my-2">{item.user}</p>
-                        {item.pricing && Object.entries(item.pricing).map(([type, { amount, currency }]) => (
-                            <p key={type} className="font-semibold">
-                                {type}: {currency} {amount}
-                            </p>
-                        ))}
-                    </CarouselItem>
-                )}
-            />
+            <div className="flex flex-wrap -mx-2">
+                {listings.map(listing => (
+                    <div key={listing.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
+                        <ListingItem
+                            id={listing.id}
+                            title={listing.title}
+                            image={listing.mainImage}
+                            description={listing.description}
+                            tag={listing.tag || 'Uncategorized'}
+                            isServiceListing={true}
+                            user={listing.user ? listing.user.firstName : 'Unknown User'}
+                            pricing={listing.pricing}
+                            status={listing.status}
+                        >
+                            <p className="font-semibold text-gray-600">{listing.user ? listing.user.firstName : 'Unknown User'}</p>
+
+                            {listing.pricing && Object.entries(listing.pricing).map(([type, { amount, currency }]) => (
+                                <p key={type} className="font-semibold">
+                                    {type}: {currency} {amount}
+                                </p>
+                            ))}
+                        </ListingItem>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
@@ -107,6 +109,7 @@ const ManageListingsPage = () => {
                     <Route path="needs-revision" element={<ListingsSection title="Listings Needing Revision" listings={listings.needsRevision} isLoading={isLoading} />} />
                     <Route path="archived" element={<ListingsSection title="Archived Listings" listings={listings.archived} isLoading={isLoading} />} />
                     <Route path="drafts" element={<ListingsSection title="Draft Listings" listings={listings.drafts} isLoading={isLoading} />} />
+                    <Route path="/edit-listing/:id" element={<EditServiceListingForm />} />
                     <Route path="/" element={<Navigate to="published" replace />} />
                 </Routes>
             </div>

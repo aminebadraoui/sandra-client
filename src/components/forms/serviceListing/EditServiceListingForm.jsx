@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 import IdeaStep from './steps/IdeaStep';
@@ -25,85 +25,107 @@ const steps = [
     'Review'
 ];
 
-const AddServiceListingForm = () => {
+const EditServiceListingForm = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const methods = useForm();
     const [currentStep, setCurrentStep] = useState(0);
     const [furthestStep, setFurthestStep] = useState(0);
     const [categories, setCategories] = useState([]);
     const [isStepValid, setIsStepValid] = useState(false);
-
-    const methods = useForm({
-        mode: 'onChange',
-        defaultValues: {
-            title: '',
-            description: '',
-            location: '',
-            category: '',
-            tag: '',
-            pricingTypes: [],
-            pricingCurrency: '',
-            pricing: {},
-            mainImage: '',
-            additionalImages: [],
-        }
-    });
-    const navigate = useNavigate();
+    const [revisionComments, setRevisionComments] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        validateStep();
-    }, [currentStep, methods.watch()]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                setCategories(data);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                // Set some default categories for now
-                setCategories([
-                    { id: 1, name: 'Category 1', tags: [{ id: 1, name: 'Tag 1' }, { id: 2, name: 'Tag 2' }] },
-                    { id: 2, name: 'Category 2', tags: [{ id: 3, name: 'Tag 3' }, { id: 4, name: 'Tag 4' }] },
-                ]);
-            }
-        };
+        fetchListingData();
         fetchCategories();
     }, []);
 
-    const validateStep = async () => {
+    const fetchListingData = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Fetched data:', data); // For debugging
+                // Transform the data to match the form structure
+                const formData = {
+                    ...data,
+                    category: data.serviceTag?.category?.id,
+                    tag: data.serviceTag?.id,
+                    pricingTypes: Object.keys(data.pricing || {}),
+                    pricingCurrency: data.currency,
+                    ...Object.entries(data.pricing || {}).reduce((acc, [type, details]) => {
+                        acc[`pricing_${type}`] = details.amount;
+                        return acc;
+                    }, {})
+                };
+                console.log('Transformed form data:', formData); // For debugging
+                methods.reset(formData);
+                setRevisionComments(data.revisionComments || {});
+                setIsLoading(false);
+            } else {
+                throw new Error('Failed to fetch listing data');
+            }
+        } catch (error) {
+            console.error('Error fetching listing data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setCategories(data);
+            } else {
+                throw new Error('Failed to fetch categories');
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (!isLoading) {
+            validateStep();
+        }
+    }, [currentStep, methods.watch(), isLoading]);
+
+    const validateStep = () => {
+        const values = methods.getValues();
         switch (currentStep) {
             case 0: // Your idea
-                const { title, description } = methods.getValues();
-                setIsStepValid(title.trim() !== '' && description.trim() !== '');
+                setIsStepValid(values.title?.trim() !== '' && values.description?.trim() !== '');
                 break;
             case 1: // Location
-                setIsStepValid(methods.getValues('location').trim() !== '');
+                setIsStepValid(values.location?.trim() !== '');
                 break;
             case 2: // Category
-                setIsStepValid(methods.getValues('category') !== '');
+                setIsStepValid(values.category !== '');
                 break;
             case 3: // Tag
-                setIsStepValid(methods.getValues('tag') !== '');
+                setIsStepValid(values.tag !== '');
                 break;
             case 4: // Pricing Types
-                setIsStepValid(methods.getValues('pricingTypes').length > 0);
+                setIsStepValid(values.pricingTypes?.length > 0);
                 break;
             case 5: // Pricing Details
-                const { pricing, pricingCurrency, pricingTypes } = methods.getValues();
                 setIsStepValid(
-                    pricingCurrency !== '' &&
-                    pricingTypes.every(type => pricing[type]?.amount > 0)
+                    values.pricingCurrency !== '' &&
+                    values.pricingTypes?.every(type => values.pricing?.[type]?.amount > 0)
                 );
                 break;
             case 6: // Main image
-                setIsStepValid(methods.getValues('mainImage') !== '');
+                setIsStepValid(values.mainImage !== '');
                 break;
             case 7: // Additional images (always valid)
                 setIsStepValid(true);
@@ -113,16 +135,11 @@ const AddServiceListingForm = () => {
         }
     };
 
-    const handleNext = async () => {
+    const handleNext = () => {
         if (isStepValid) {
             const nextStep = Math.min(currentStep + 1, steps.length - 1);
             setCurrentStep(nextStep);
             setFurthestStep(Math.max(furthestStep, nextStep));
-
-            // If it's the last step, don't automatically submit
-            if (nextStep === steps.length - 1) {
-                return;
-            }
         }
     };
 
@@ -138,64 +155,68 @@ const AddServiceListingForm = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        console.log("Form submit triggered");
         if (currentStep === steps.length - 1) {
-            console.log("Last step reached, attempting submission");
             onSubmit(methods.getValues());
         } else {
-            console.log("Moving to next step");
             handleNext();
         }
     };
 
     const onSubmit = async (data) => {
-        console.log("onSubmit function called", data);
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings`, {
-                method: 'POST',
+            console.log('Form data before transformation:', data); // For debugging
+            // Transform the form data back to the API structure
+            const apiData = {
+                ...data,
+                serviceTag: data.tag, // This should be the ID of the selected tag
+                currency: data.pricingCurrency,
+                pricing: data.pricingTypes.reduce((acc, type) => {
+                    acc[type] = { amount: parseFloat(data[`pricing_${type}`]) };
+                    return acc;
+                }, {}),
+                status: 'in_review'
+            };
+            console.log('Transformed API data:', apiData); // For debugging
+
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings/${id}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({
-                    ...data,
-                    status: 'in_review',
-                    currency: data.pricingCurrency
-                })
+                body: JSON.stringify(apiData)
             });
-
-            console.log("API response received", response);
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('Listing submitted for review:', result);
-                navigate('/manage-listings?status=in_review');
+                console.log('Listing updated:', result);
+                navigate('/manage-listings/in-review');
             } else {
-                console.error('Failed to submit listing');
+                throw new Error('Failed to update listing');
             }
         } catch (error) {
-            console.error('Error submitting listing:', error);
+            console.error('Error updating listing:', error);
         }
     };
 
     const renderStep = () => {
         switch (currentStep) {
             case 0:
-                return <IdeaStep />;
+                return <IdeaStep revisionComments={revisionComments.idea} />;
             case 1:
-                return <LocationStep />;
+                return <LocationStep revisionComments={revisionComments.location} />;
             case 2:
-                return <CategoryStep categories={categories} />;
+                return <CategoryStep categories={categories} revisionComments={revisionComments.category} />;
             case 3:
-                return <TagStep categories={categories} />;
+                return <TagStep categories={categories} revisionComments={revisionComments.tag} />;
             case 4:
-                return <PricingTypesStep />;
+                return <PricingTypesStep revisionComments={revisionComments.pricingTypes} />;
             case 5:
-                return <PricingDetailsStep />;
+                return <PricingDetailsStep revisionComments={revisionComments.pricing} />;
             case 6:
-                return <MainImageStep />;
+                return <MainImageStep revisionComments={revisionComments.mainImage} />;
             case 7:
-                return <AdditionalImagesStep />;
+                return <AdditionalImagesStep revisionComments={revisionComments.additionalImages} />;
             case 8:
                 return <ReviewStep categories={categories} />;
             default:
@@ -208,12 +229,16 @@ const AddServiceListingForm = () => {
         }
     };
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <FormProvider {...methods}>
             <div className="min-h-screen bg-white flex">
                 {/* Sidebar */}
                 <div className="w-64 bg-gray-100 p-6">
-                    <h2 className="text-xl font-bold mb-4">Submit your experience</h2>
+                    <h2 className="text-xl font-bold mb-4">Edit your experience</h2>
                     <ul>
                         {steps.map((step, index) => (
                             <li
@@ -270,7 +295,7 @@ const AddServiceListingForm = () => {
                                     type="submit"
                                     className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 transition duration-200"
                                 >
-                                    {currentStep === steps.length - 1 ? 'Submit Listing' : 'Next'}
+                                    {currentStep === steps.length - 1 ? 'Update Listing' : 'Next'}
                                 </button>
                             </div>
                         </form>
@@ -281,4 +306,4 @@ const AddServiceListingForm = () => {
     );
 };
 
-export default AddServiceListingForm;
+export default EditServiceListingForm;

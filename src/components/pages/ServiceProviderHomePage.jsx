@@ -1,6 +1,6 @@
 import React from 'react';
 import Carousel from "../containers/Carousel"
-import CarouselItem from '../features/CarouselItem';
+import CarouselItem from '../features/ListingItem';
 import Section from '../containers/Section';
 import { useState, useEffect } from 'react';
 

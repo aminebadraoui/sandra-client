@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const TagStep = ({ categories }) => {
+const TagStep = ({ categories, revisionComments }) => {
     const { setValue, watch, formState: { errors } } = useFormContext();
 
     const selectedCategory = watch('category');
@@ -11,6 +11,13 @@ const TagStep = ({ categories }) => {
     return (
         <div className="space-y-4">
             <h2 className="text-2xl font-bold text-center">Tag</h2>
+            {revisionComments && (
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                    <p className="font-bold">Revision Comments:</p>
+                    <p>{revisionComments}</p>
+                </div>
+            )}
+
             {selectedCategoryTags.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                     {selectedCategoryTags.map((tag) => (

@@ -9,13 +9,21 @@ const pricingTypes = [
     { value: 'per-day', label: 'Per Day' }
 ];
 
-const PricingDetailsStep = () => {
+const PricingDetailsStep = ({ revisionComments }) => {
     const { register, watch } = useFormContext();
     const selectedTypes = watch('pricingTypes') || [];
 
     return (
         <div className="space-y-4">
             <h2 className="text-2xl font-bold text-center">Pricing Details</h2>
+
+            {revisionComments && (
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                    <p className="font-bold">Revision Comments:</p>
+                    <p>{revisionComments}</p>
+                </div>
+            )}
+
             <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">Currency</label>
                 <select
