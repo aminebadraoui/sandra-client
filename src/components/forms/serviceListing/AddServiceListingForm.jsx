@@ -31,6 +31,7 @@ const AddServiceListingForm = () => {
     const [categories, setCategories] = useState([]);
     const [isStepValid, setIsStepValid] = useState(false);
     const methods = useForm({
+        mode: 'onChange',
         defaultValues: {
             title: '',
             description: '',
@@ -40,7 +41,6 @@ const AddServiceListingForm = () => {
             pricingTypes: [],
             pricingCurrency: '',
             pricing: {},
-            pricingCurrency: '',
             mainImage: '',
             additionalImages: [],
         }
@@ -117,6 +117,11 @@ const AddServiceListingForm = () => {
             const nextStep = Math.min(currentStep + 1, steps.length - 1);
             setCurrentStep(nextStep);
             setFurthestStep(Math.max(furthestStep, nextStep));
+
+            // If it's the last step, don't automatically submit
+            if (nextStep === steps.length - 1) {
+                return;
+            }
         }
     };
 
@@ -130,7 +135,20 @@ const AddServiceListingForm = () => {
         }
     };
 
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        console.log("Form submit triggered");
+        if (currentStep === steps.length - 1) {
+            console.log("Last step reached, attempting submission");
+            onSubmit(methods.getValues());
+        } else {
+            console.log("Moving to next step");
+            handleNext();
+        }
+    };
+
     const onSubmit = async (data) => {
+        console.log("onSubmit function called", data);
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings`, {
                 method: 'POST',
@@ -144,6 +162,8 @@ const AddServiceListingForm = () => {
                     currency: data.pricingCurrency
                 })
             });
+
+            console.log("API response received", response);
 
             if (response.ok) {
                 const result = await response.json();
@@ -233,7 +253,7 @@ const AddServiceListingForm = () => {
 
                     {/* Form content */}
                     <div className="max-w-2xl mx-auto">
-                        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+                        <form onSubmit={handleFormSubmit} className="space-y-6">
                             {renderStep()}
                             <div className="flex justify-between mt-6">
                                 {currentStep > 0 && (
@@ -245,23 +265,12 @@ const AddServiceListingForm = () => {
                                         Previous
                                     </button>
                                 )}
-                                {currentStep < steps.length - 1 ? (
-                                    <button
-                                        type="button"
-                                        onClick={handleNext}
-                                        disabled={!isStepValid}
-                                        className={`px-6 py-2 ${isStepValid ? 'bg-rose-500 text-white' : 'bg-gray-300 text-gray-500'} rounded hover:bg-rose-600 transition duration-200`}
-                                    >
-                                        Next
-                                    </button>
-                                ) : (
-                                    <button
-                                        type="submit"
-                                        className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 transition duration-200"
-                                    >
-                                        Submit Listing
-                                    </button>
-                                )}
+                                <button
+                                    type="submit"
+                                    className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 transition duration-200"
+                                >
+                                    {currentStep === steps.length - 1 ? 'Submit Listing' : 'Next'}
+                                </button>
                             </div>
                         </form>
                     </div>
