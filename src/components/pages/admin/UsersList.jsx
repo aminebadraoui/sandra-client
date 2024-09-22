@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useUserStore from '../../state/userStore';
+import useUserStore from '../../../state/userStore';
 
 const UsersList = () => {
     const [users, setUsers] = useState([]);
@@ -44,7 +44,7 @@ const UsersList = () => {
                         {!user.isAdmin && (
                             <button
                                 onClick={() => handleMakeAdmin(user.id)}
-                                className="ml-4 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                                className="ml-4 bg-rose-500 text-white px-2 py-1 rounded hover:bg-rose-600"
                             >
                                 Make Admin
                             </button>

@@ -23,7 +23,7 @@ export const serviceProviderMenu = [
     },
     {
         name: "Manage Services",
-        path: '/manage-listing'
+        path: '/manage-listings'
     },
     {
         name: "Account",

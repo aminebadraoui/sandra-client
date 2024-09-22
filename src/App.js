@@ -5,10 +5,11 @@ import Navbar from './components/features/Navbar';
 import RegisterModal from './components/features/RegisterModal';
 import SigninModal from './components/features/SigninModal';
 import UserHomePage from './components/pages/UserHomePage';
-import AdminDashboard from './components/pages/AdminDashboard';
+import AdminDashboard from './components/pages/admin/AdminDashboard';
 import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
-import AddServiceListingForm from './components/forms/AddServiceListingForm';
+import AddServiceListingForm from './components/forms/serviceListing/AddServiceListingForm';
+import ManageListingsPage from './components/pages/ManageListingsPage';
 
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
@@ -35,12 +36,12 @@ function App() {
           element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
         />
         <Route
-          path="/add-event-listing"
+          path="/add-event-listings"
           element={user && user.role === "organizer" ? <div>Add Event Listing Page</div> : <Navigate to="/" />}
         />
         <Route
-          path="/manage-listing"
-          element={user ? <div>Manage Listing Page (User: {user.email})</div> : <Navigate to="/" />}
+          path="/manage-listings"
+          element={user ? <ManageListingsPage /> : <Navigate to="/" />}
         />
         <Route
           path="/account"

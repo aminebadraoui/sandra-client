@@ -21,7 +21,7 @@ const Navbar = () => {
                     {user && (
                         <>
                             {user.isAdmin && (
-                                <Link to="/admin" className="text-blue-600 hover:text-blue-800">
+                                <Link to="/admin" className="text-rose-600 hover:text-rose-800">
                                     Admin Dashboard
                                 </Link>
                             )}
@@ -32,7 +32,7 @@ const Navbar = () => {
                                 <Switch
                                     checked={user.role === "organizer"}
                                     onChange={toggleRole}
-                                    className={`${user.role === "organizer" ? "bg-blue-600" : "bg-green-500"
+                                    className={`${user.role === "organizer" ? "bg-yellow-600" : "bg-green-500"
                                         } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                                 >
                                     <span

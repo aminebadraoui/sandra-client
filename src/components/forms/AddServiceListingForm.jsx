@@ -580,7 +580,7 @@ const AddServiceListingForm = () => {
                             <button
                                 type="button"
                                 onClick={methods.handleSubmit(onSubmit)}
-                                className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-blue-600"
+                                className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600"
                             >
                                 Submit Listing
                             </button>

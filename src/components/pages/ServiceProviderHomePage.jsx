@@ -1,8 +1,8 @@
 import React from 'react';
-import Carousel from '../containers/Carousel';
+import Carousel from "../containers/Carousel"
 import CarouselItem from '../features/CarouselItem';
 import Section from '../containers/Section';
-
+import { useState, useEffect } from 'react';
 
 
 const LatestEvents = () => (
@@ -168,30 +168,43 @@ const UpcomingEvents = () => (
     </Section>
 );
 
-const ActiveListings = () => (
-    <Section title="Your Active Service Listings">
-        <Carousel
-            items={[
-                {
-                    title: "Photography Services",
-                    image: "http://via.placeholder.com/1280x720",
-                    description: "Professional photography for all types of events.",
-                    services: "Photography",
+const ActiveListings = () => {
+    const [listings, setListings] = useState([]);
+
+    useEffect(() => {
+        const fetchListings = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/service-listings`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setListings(data.filter(listing => listing.status === 'active'));
+                }
+            } catch (error) {
+                console.error('Error fetching listings:', error);
+            }
+        };
+        fetchListings();
+    }, []);
+
+    return (
+        <Section title="Your Active Service Listings">
+            <Carousel
+                items={listings.map(listing => ({
+                    title: listing.title,
+                    image: listing.mainImage,
+                    description: listing.description,
+                    services: listing.category,
                     isServiceListing: true
-                },
-                {
-                    title: "Catering Services",
-                    image: "http://via.placeholder.com/1280x720",
-                    description: "Gourmet catering for events of all sizes.",
-                    services: "Catering",
-                    isServiceListing: true
-                },
-                // ... add more items
-            ]}
-            renderItem={(item) => <CarouselItem {...item} />}
-        />
-    </Section>
-);
+                }))}
+                renderItem={(item) => <CarouselItem {...item} />}
+            />
+        </Section>
+    );
+};
 
 const ServiceProviderHomePage = () => {
     return (
