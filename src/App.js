@@ -40,7 +40,7 @@ function App() {
           element={user && user.role === "organizer" ? <div>Add Event Listing Page</div> : <Navigate to="/" />}
         />
         <Route
-          path="/manage-listings"
+          path="/manage-listings/*"
           element={user ? <ManageListingsPage /> : <Navigate to="/" />}
         />
         <Route
@@ -61,9 +61,8 @@ function App() {
       <div>
         {showLoginModal && <SigninModal />}
         {showRegisterModal && <RegisterModal />}
-
         <Navbar />
-        <div className='pt-[50px]'>
+        <div className='pt-[100px]'>
           <div className='h-full'>
             {renderContent()}
           </div>

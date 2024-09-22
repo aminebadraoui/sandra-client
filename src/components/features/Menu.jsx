@@ -30,13 +30,13 @@ const Menu = () => {
 
     return (
         <>
-            <div className="relative bg-white p-2 border-[1px] rounded shadow-md">
-                <div className="flex flex-row items-center gap-2 hover:cursor-pointer">
+            <div className="relative bg-white p-2 border-[1px] rounded shadow-md w-24">
+                <div className="flex flex-row justify-between items-center gap-2 hover:cursor-pointer">
                     <div className="" onClick={toggleMenu} >
                         <AiOutlineMenu />
                     </div>
                     <div>
-                        <Avatar />
+                        <Avatar size="sm" />
                     </div>
                 </div>
 

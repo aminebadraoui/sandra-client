@@ -1,20 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { Tab } from '@headlessui/react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import Carousel from '../containers/Carousel';
-import CarouselItem from '../features/CarouselItem'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import ManageListingsSidebar from '../features/ManageListingsSidebar';
+import Carousel from "../containers/Carousel";
+import CarouselItem from '../features/CarouselItem';
+import LoadingSpinner from '../reusable/LoadingSpinner';
 
+const ListingsSection = ({ title, listings, isLoading }) => {
+    if (isLoading) {
+        return (
+            <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    if (!listings || listings.length === 0) {
+        return (
+            <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+                <div className="text-center text-gray-500 p-8 bg-white rounded-lg shadow">
+                    <p>No listings to display at this time.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+            <Carousel
+                items={listings.map(listing => ({
+                    id: listing.id,
+                    title: listing.title,
+                    image: listing.mainImage,
+                    description: listing.description,
+                    tag: listing.tag || 'Uncategorized',
+                    isServiceListing: true,
+                    user: listing.user ? listing.user.firstName : 'Unknown User',
+                    pricing: listing.pricing,
+                    status: listing.status
+                }))}
+                renderItem={(item) => (
+                    <CarouselItem {...item}>
+                        <p className="font-semibold text-gray-800 my-2">{item.user}</p>
+                        {item.pricing && Object.entries(item.pricing).map(([type, { amount, currency }]) => (
+                            <p key={type} className="font-semibold">
+                                {type}: {currency} {amount}
+                            </p>
+                        ))}
+                    </CarouselItem>
+                )}
+            />
+        </div>
+    );
+};
 
 const ManageListingsPage = () => {
-    const [listings, setListings] = useState({ active: [], in_review: [], archived: [], drafts: [] });
-    const location = useLocation();
-    const navigate = useNavigate();
+    const [listings, setListings] = useState({
+        published: [],
+        inReview: [],
+        needsRevision: [],
+        archived: [],
+        drafts: []
+    });
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         fetchListings();
     }, []);
 
     const fetchListings = async () => {
+        setIsLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings`, {
                 headers: {
@@ -24,91 +81,35 @@ const ManageListingsPage = () => {
             if (response.ok) {
                 const data = await response.json();
                 setListings({
-                    active: data.filter(listing => listing.status === 'active'),
-                    in_review: data.filter(listing => listing.status === 'in_review'),
+                    published: data.filter(listing => listing.status === 'active'),
+                    inReview: data.filter(listing => listing.status === 'in_review'),
+                    needsRevision: data.filter(listing => listing.status === 'needs_revision'),
                     archived: data.filter(listing => listing.status === 'archived'),
                     drafts: data.filter(listing => listing.status === 'draft')
                 });
+            } else {
+                console.error('Error fetching listings:', response.status, response.statusText);
             }
         } catch (error) {
             console.error('Error fetching listings:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
-
-    const tabNames = {
-        active: 'Active',
-        in_review: 'In Review',
-        archived: 'Archived',
-        drafts: 'Drafts'
-    };
-
-    const getActiveTabIndex = () => {
-        const params = new URLSearchParams(location.search);
-        const status = params.get('status');
-        const statuses = Object.keys(tabNames);
-        return statuses.indexOf(status) !== -1 ? statuses.indexOf(status) : 0;
-    };
-
-    const handleTabChange = (index) => {
-        const statuses = Object.keys(tabNames);
-        navigate(`/manage-listings?status=${statuses[index]}`);
-    };
-
-    const renderCarousel = (listingsArray) => {
-        if (listingsArray.length === 0) {
-            return <NoListings />;
-        }
-        return (
-            <Carousel
-                items={listingsArray.map(listing => ({
-                    title: listing.title,
-                    image: listing.mainImage,
-                    description: listing.description,
-                    tag: listing.tag,
-                    pricing: listing.pricing,
-                    currency: listing.currency,
-                    isServiceListing: true,
-                    providerFirstName: listing.user.firstName
-                }))}
-                renderItem={(item) => <CarouselItem {...item} />}
-            />
-        );
-    };
-
-    const NoListings = () => {
-        return (
-            <div className="bg-white shadow-lg rounded-lg p-8 text-center">
-                <p className="text-xl text-gray-600">No listings to display.</p>
-            </div>
-        );
-    };
-
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Manage Listings</h1>
-            <Tab.Group selectedIndex={getActiveTabIndex()} onChange={handleTabChange}>
-                <Tab.List className="flex space-x-1 rounded-xl bg-rose-900/20 p-1 mb-4">
-                    {Object.entries(tabNames).map(([key, name]) => (
-                        <Tab
-                            key={key}
-                            className={({ selected }) =>
-                                `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-rose-700
-                                ${selected ? 'bg-white shadow' : 'text-rose-100 hover:bg-white/[0.12] hover:text-white'}`
-                            }
-                        >
-                            {name}
-                        </Tab>
-                    ))}
-                </Tab.List>
-                <Tab.Panels>
-                    {Object.keys(tabNames).map((status) => (
-                        <Tab.Panel key={status}>
-                            {renderCarousel(listings[status])}
-                        </Tab.Panel>
-                    ))}
-                </Tab.Panels>
-            </Tab.Group>
+        <div className="flex">
+            <ManageListingsSidebar />
+            <div className="flex-1 p-8">
+                <Routes>
+                    <Route path="published" element={<ListingsSection title="Published Listings" listings={listings.published} isLoading={isLoading} />} />
+                    <Route path="in-review" element={<ListingsSection title="Listings In Review" listings={listings.inReview} isLoading={isLoading} />} />
+                    <Route path="needs-revision" element={<ListingsSection title="Listings Needing Revision" listings={listings.needsRevision} isLoading={isLoading} />} />
+                    <Route path="archived" element={<ListingsSection title="Archived Listings" listings={listings.archived} isLoading={isLoading} />} />
+                    <Route path="drafts" element={<ListingsSection title="Draft Listings" listings={listings.drafts} isLoading={isLoading} />} />
+                    <Route path="/" element={<Navigate to="published" replace />} />
+                </Routes>
+            </div>
         </div>
     );
 };
