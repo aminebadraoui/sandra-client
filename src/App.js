@@ -9,8 +9,9 @@ import AdminDashboard from './components/pages/admin/AdminDashboard';
 import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
 import AddServiceListingForm from './components/forms/serviceListing/AddServiceListingForm';
-import ManageListingsPage from './components/pages/ManageListingsPage';
+import ManageListingsPage from './components/pages/service provider/ManageListingsPage';
 import EditServiceListingForm from './components/forms/serviceListing/EditServiceListingForm';
+import LandingPage from './components/pages/general/LandingPage';
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
   const showRegisterModal = useModalStore(state => state.showRegisterModal)
@@ -30,7 +31,7 @@ function App() {
 
     return (
       <Routes>
-        <Route path="/" element={user ? <UserHomePage /> : <div>Content for non-logged in users</div>} />
+        <Route path="/" element={user ? <UserHomePage /> : <LandingPage />} />
         <Route
           path="/add-service-listing"
           element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
@@ -59,14 +60,15 @@ function App() {
 
   return (
     <Router>
-      <div>
-        {showLoginModal && <SigninModal />}
-        {showRegisterModal && <RegisterModal />}
-        <Navbar />
-        <div className='pt-[100px]'>
-          <div className='h-full'>
-            {renderContent()}
-          </div>
+      <Navbar />
+      {showLoginModal && !showRegisterModal && <SigninModal />}
+      <div className="flex flex-col min-h-screen">
+
+
+        {showRegisterModal && !showLoginModal && <RegisterModal />}
+
+        <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-[100px]">
+          {renderContent()}
         </div>
       </div>
     </Router>

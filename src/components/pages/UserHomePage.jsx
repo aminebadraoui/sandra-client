@@ -1,7 +1,7 @@
 import React from "react";
 import useUserStore from '../../state/userStore';
-import ServiceProviderHomePage from './ServiceProviderHomePage';
-import OrganizerHomePage from './OrganizerHomePage';
+import ServiceProviderHomePage from './service provider/ServiceProviderHomePage';
+import OrganizerHomePage from './event organizer/OrganizerHomePage';
 
 const UserHomePage = () => {
     const { user } = useUserStore();

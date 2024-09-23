@@ -40,8 +40,9 @@ const ReviewListings = () => {
     };
 
     const handleReviewAction = async (action) => {
+
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/admin/review-listing/${selectedListing.id}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/admin/service-listings/${selectedListing.id}/review`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ import useUserStore from "../../state/userStore";
 
 const SigninModal = () => {
     // Hooks
-    const onRegisterModalClose = () => {
+    const onSigninModalClose = () => {
         useModalStore.getState().closeLoginModal()
     }
 
@@ -62,6 +62,7 @@ const SigninModal = () => {
                 localStorage.setItem('token', data.token);
                 setUser(data.user)
                 console.log("success login")
+                onSigninModalClose()
                 return { success: true };
 
             } else {
@@ -121,12 +122,9 @@ const SigninModal = () => {
 
 
     return (
-        <Modal title={"Sign up"} onClose={onRegisterModalClose}>
-            <div className="p-4">
-                {!isSuccess && !isError && form}
-
-                {isError && errorForm}
-            </div>
+        <Modal title="Sign in" onClose={onSigninModalClose}>
+            {!isSuccess && !isError && form}
+            {isError && errorForm}
         </Modal>
     );
 }
