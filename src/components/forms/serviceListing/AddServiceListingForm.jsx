@@ -169,7 +169,7 @@ const AddServiceListingForm = () => {
             if (response.ok) {
                 const result = await response.json();
                 console.log('Listing submitted for review:', result);
-                navigate('/manage-listings?status=in_review');
+                navigate('/manage-listings/in-review');
             } else {
                 console.error('Failed to submit listing');
             }
@@ -270,7 +270,7 @@ const AddServiceListingForm = () => {
                                     type="submit"
                                     className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 transition duration-200"
                                 >
-                                    {currentStep === steps.length - 1 ? 'Submit Listing' : 'Next'}
+                                    {currentStep === steps.length - 1 ? 'Submit For Review' : 'Next'}
                                 </button>
                             </div>
                         </form>

@@ -79,9 +79,6 @@ const SigninModal = () => {
 
     const form = (
         <div className="flex flex-col gap-2">
-            <div>
-                <h1 className="font-bold"> Welcome To Sandra </h1>
-            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
@@ -122,7 +119,7 @@ const SigninModal = () => {
 
 
     return (
-        <Modal title="Sign in" onClose={onSigninModalClose}>
+        <Modal title="Welcome back!" onClose={onSigninModalClose}>
             {!isSuccess && !isError && form}
             {isError && errorForm}
         </Modal>

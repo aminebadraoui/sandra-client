@@ -9,9 +9,10 @@ import AdminDashboard from './components/pages/admin/AdminDashboard';
 import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
 import AddServiceListingForm from './components/forms/serviceListing/AddServiceListingForm';
-import ManageListingsPage from './components/pages/service provider/ManageListingsPage';
+import ManageListingsPage from './components/pages/Manage Listing/ManageListingsPage';
 import EditServiceListingForm from './components/forms/serviceListing/EditServiceListingForm';
 import LandingPage from './components/pages/general/LandingPage';
+import AddEventListingForm from './components/forms/eventListing/AddEventListingForm';
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
   const showRegisterModal = useModalStore(state => state.showRegisterModal)
@@ -37,8 +38,8 @@ function App() {
           element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
         />
         <Route
-          path="/add-event-listings"
-          element={user && user.role === "organizer" ? <div>Add Event Listing Page</div> : <Navigate to="/" />}
+          path="/add-event-listing"
+          element={user && user.role === "organizer" ? <AddEventListingForm /> : <Navigate to="/" />}
         />
         <Route path="/edit-listing/:id" element={<EditServiceListingForm />} />
         <Route
@@ -66,8 +67,9 @@ function App() {
 
 
         {showRegisterModal && !showLoginModal && <RegisterModal />}
+        {/* {true && <RegisterModal />} */}
 
-        <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-[100px]">
+        <div className="flex-grow container mt-[80px]">
           {renderContent()}
         </div>
       </div>

@@ -15,7 +15,7 @@ const ReviewListings = () => {
         // Automatically select the first listing if available
         if (listings.length > 0 && !selectedListing) {
             setSelectedListing(listings[0]);
-            setComments({}); // Reset comments when selecting a new listing
+            setComments({});
         }
     }, [listings, selectedListing]);
 
@@ -40,7 +40,6 @@ const ReviewListings = () => {
     };
 
     const handleReviewAction = async (action) => {
-
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/admin/service-listings/${selectedListing.id}/review`, {
                 method: 'POST',
@@ -61,13 +60,24 @@ const ReviewListings = () => {
                 })
             });
             if (response.ok) {
-                fetchListings();
-                setSelectedListing(null);
-                setComments({});
+                await fetchListings();
+                selectNextListing();
             }
         } catch (error) {
             console.error('Error reviewing listing:', error);
         }
+    };
+
+    const selectNextListing = () => {
+        const currentIndex = listings.findIndex(listing => listing.id === selectedListing.id);
+        if (currentIndex < listings.length - 1) {
+            setSelectedListing(listings[currentIndex + 1]);
+        } else if (listings.length > 0) {
+            setSelectedListing(listings[0]);
+        } else {
+            setSelectedListing(null);
+        }
+        setComments({});
     };
 
     return (

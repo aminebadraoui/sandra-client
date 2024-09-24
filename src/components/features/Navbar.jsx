@@ -19,7 +19,7 @@ const Navbar = () => {
     };
 
     return (
-        <div className="bg-white fixed z-50 w-full border-b border-[1px] shadow-md h-auto py-2">
+        <div className="bg-white fixed z-50 w-full border-b border-[1px] shadow-md h-[80px] py-2">
             <div className="flex flex-row justify-between items-center h-full px-4 max-w-7xl mx-auto">
                 <Link to="/" className="flex items-center">
                     <Logo />

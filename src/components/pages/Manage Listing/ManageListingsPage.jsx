@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ManageListingsSidebar from '../../features/ManageListingsSidebar';
 import EditServiceListingForm from '../../forms/serviceListing/EditServiceListingForm';
+import EditEventListingForm from '../../forms/eventListing/EditEventListingForm';
 import ListingItem from '../../features/ListingItem';
 import LoadingSpinner from '../../reusable/LoadingSpinner';
+import useUserStore from '../../../state/userStore';
 
-const ListingsSection = ({ title, listings, isLoading }) => {
+const ListingsSection = ({ title, listings, isLoading, isEventListing }) => {
     if (isLoading) {
         return (
             <div className="mt-8">
@@ -35,21 +37,16 @@ const ListingsSection = ({ title, listings, isLoading }) => {
                         <ListingItem
                             id={listing.id}
                             title={listing.title}
-                            image={listing.mainImage}
+                            image={listing.mainImage || listing.imageUrls[0]}
                             description={listing.description}
                             tag={listing.tag || 'Uncategorized'}
-                            isServiceListing={true}
+                            isServiceListing={!isEventListing}
                             user={listing.user ? listing.user.firstName : 'Unknown User'}
                             pricing={listing.pricing}
                             status={listing.status}
+                            date={isEventListing ? listing.date : null}
                         >
-                            <p className="font-semibold text-gray-600">{listing.user ? listing.user.firstName : 'Unknown User'}</p>
-
-                            {listing.pricing && Object.entries(listing.pricing).map(([type, { amount, currency }]) => (
-                                <p key={type} className="font-semibold">
-                                    {type}: {currency} {amount}
-                                </p>
-                            ))}
+                            {/* Additional content for the listing item */}
                         </ListingItem>
                     </div>
                 ))}
@@ -67,15 +64,20 @@ const ManageListingsPage = () => {
         drafts: []
     });
     const [isLoading, setIsLoading] = useState(true);
+    const userType = useUserStore(state => state.user.role);
+    const isEventOrganizer = userType === 'organizer';
+
+    console.log(userType)
 
     useEffect(() => {
         fetchListings();
-    }, []);
+    }, [userType]);
 
     const fetchListings = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings`, {
+            const endpoint = userType === 'serviceProvider' ? 'service-listings' : 'event-listings';
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/${endpoint}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -101,7 +103,7 @@ const ManageListingsPage = () => {
 
     return (
         <div className="flex">
-            <ManageListingsSidebar />
+            <ManageListingsSidebar isEventOrganizer={isEventOrganizer} />
             <div className="flex-1 p-8">
                 <Routes>
                     <Route path="published" element={<ListingsSection title="Published Listings" listings={listings.published} isLoading={isLoading} />} />
@@ -109,7 +111,7 @@ const ManageListingsPage = () => {
                     <Route path="needs-revision" element={<ListingsSection title="Listings Needing Revision" listings={listings.needsRevision} isLoading={isLoading} />} />
                     <Route path="archived" element={<ListingsSection title="Archived Listings" listings={listings.archived} isLoading={isLoading} />} />
                     <Route path="drafts" element={<ListingsSection title="Draft Listings" listings={listings.drafts} isLoading={isLoading} />} />
-                    <Route path="/edit-listing/:id" element={<EditServiceListingForm />} />
+                    <Route path="/edit-listing/:id" element={isEventOrganizer ? <EditEventListingForm /> : <EditServiceListingForm />} />
                     <Route path="/" element={<Navigate to="published" replace />} />
                 </Routes>
             </div>

@@ -17,9 +17,12 @@ export const noSessionMenu = [
 ]
 
 export const serviceProviderMenu = [
-
     {
-        name: "Manage Services",
+        name: "Add Service Listing",
+        path: '/add-service-listing'
+    },
+    {
+        name: "Manage Listings",
         path: '/manage-listings'
     },
     {
@@ -46,8 +49,8 @@ export const organizerMenu = [
         path: '/add-event-listing'
     },
     {
-        name: "Manage Events",
-        path: '/manage-events'
+        name: "Manage Listings",
+        path: '/manage-listings'
     },
     {
         name: "Account",

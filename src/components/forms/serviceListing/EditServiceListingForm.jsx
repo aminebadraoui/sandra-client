@@ -174,7 +174,8 @@ const EditServiceListingForm = () => {
                     acc[type] = { amount: parseFloat(data[`pricing_${type}`]) };
                     return acc;
                 }, {}),
-                status: 'in_review'
+                status: 'in_review',
+                revisionComments: {}
             };
             console.log('Transformed API data:', apiData); // For debugging
 

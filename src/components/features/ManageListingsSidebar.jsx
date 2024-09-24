@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const ManageListingsSidebar = () => {
+const ManageListingsSidebar = ({ isEventOrganizer }) => {
     const [isYourListingsExpanded, setIsYourListingsExpanded] = useState(true);
     const location = useLocation();
 
@@ -12,13 +12,16 @@ const ManageListingsSidebar = () => {
         : 'hover:text-rose-500'
         }`;
 
+    const createListingPath = isEventOrganizer ? "/add-event-listing" : "/add-service-listing";
+    const listingType = isEventOrganizer ? "Event" : "Service";
+
     return (
         <div className="bg-white w-64 min-h-screen shadow-md">
-            <h2 className="text-2xl font-bold p-4 border-b">Manage Listings</h2>
+            <h2 className="text-2xl font-bold p-4 border-b">Manage {listingType} Listings</h2>
 
             <div className="p-4">
-                <Link to="/add-service-listing" className="block w-full bg-rose-500 text-white text-center py-2 rounded-md hover:bg-rose-600 transition duration-300">
-                    Create Listing
+                <Link to={createListingPath} className="block w-full bg-rose-500 text-white text-center py-2 rounded-md hover:bg-rose-600 transition duration-300">
+                    Create {listingType} Listing
                 </Link>
             </div>
 
@@ -28,7 +31,7 @@ const ManageListingsSidebar = () => {
                         onClick={() => setIsYourListingsExpanded(!isYourListingsExpanded)}
                         className="flex items-center justify-between w-full p-4 text-left hover:bg-gray-100 font-bold"
                     >
-                        <span>Your Listings</span>
+                        <span>Your {listingType} Listings</span>
                         <span>{isYourListingsExpanded ? '▼' : '▶'}</span>
                     </button>
                     {isYourListingsExpanded && (
