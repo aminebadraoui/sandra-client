@@ -58,7 +58,7 @@ const LandingPage = () => {
     return (
         <div className="bg-white">
             {/* Hero Section */}
-            <section className="relative h-screen w-full">
+            <section className="relative w-screen h-screen">
                 <img
                     src="https://res.cloudinary.com/dbwefnkfe/image/upload/v1728009026/campfire-1024x700_fbpig0.jpg"
                     alt="Serene retreat setting"
@@ -66,7 +66,7 @@ const LandingPage = () => {
                 />
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <div className="relative z-10 h-full flex items-center justify-center">
-                    <div className="text-center px-md sm:px-lg lg:px-xl mx-auto max-w-4xl">
+                    <div className="text-center px-4 sm:px-6 md:px-8 lg:px-16 xl:px-24 mx-auto max-w-4xl">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-md">
                             Craft Transformative Retreat Experiences
                         </h1>
@@ -113,8 +113,8 @@ const LandingPage = () => {
                     <div className="md:w-1/2">
                         <img src="https://res.cloudinary.com/dbwefnkfe/image/upload/v1728009208/Best-Yoga-Retreats-in-the-World-1-1500-op_zdr7fd.jpg" alt="Retreat Organizer in a serene setting" className="rounded-lg shadow-md w-full" />
                     </div>
-                    <div className="md:w-1/2 flex flex-col justify-center">
-                        <h2 className="text-3xl font-bold mb-lg">Empower Your Retreat Vision</h2>
+                    <div className="md:w-1/2 flex flex-col justify-center items-center md:items-start">
+                        <h2 className="text-3xl font-bold mb-lg text-center md:text-left">Empower Your Retreat Vision</h2>
                         <ul className="space-y-md mb-lg">
                             <li className="flex items-start">
                                 <FaMountain className="text-primary-500 mr-sm text-xl flex-shrink-0" />
@@ -129,7 +129,7 @@ const LandingPage = () => {
                                 <span>Bring your healing and growth-focused retreats to life</span>
                             </li>
                         </ul>
-                        <Link onClick={() => openRegisterModal('organizer')} className="bg-primary-500 text-white px-lg py-sm rounded-md font-semibold hover:bg-primary-600 transition duration-300 self-start">
+                        <Link onClick={() => openRegisterModal('organizer')} className="bg-primary-500 text-white px-lg py-sm rounded-md font-semibold hover:bg-primary-600 transition duration-300 self-center md:self-start">
                             Create Your Sanctuary
                         </Link>
                     </div>
@@ -142,8 +142,8 @@ const LandingPage = () => {
                     <div className="md:w-1/2">
                         <img src="https://res.cloudinary.com/dbwefnkfe/image/upload/v1728009448/traworld_k2bd56ib33n_untitled-design_17_qc0jel.webp" alt="Service Provider at a retreat" className="rounded-lg shadow-md w-full" />
                     </div>
-                    <div className="md:w-1/2 flex flex-col justify-center">
-                        <h2 className="text-3xl font-bold mb-lg">Elevate Your Services, Enhance Retreats</h2>
+                    <div className="md:w-1/2 flex flex-col justify-center items-center md:items-start">
+                        <h2 className="text-3xl font-bold mb-lg text-center md:text-left">Elevate Your Services, Enhance Retreats</h2>
                         <ul className="space-y-md mb-lg">
                             <li className="flex items-start">
                                 <FaStar className="text-primary-500 mr-sm text-xl flex-shrink-0" />
@@ -158,7 +158,7 @@ const LandingPage = () => {
                                 <span>Expand your reach in the growing retreat and wellness industry</span>
                             </li>
                         </ul>
-                        <Link onClick={() => openRegisterModal('serviceProvider')} className="bg-primary-500 text-white px-lg py-sm rounded-md font-semibold hover:bg-primary-600 transition duration-300 self-start">
+                        <Link onClick={() => openRegisterModal('serviceProvider')} className="bg-primary-500 text-white px-lg py-sm rounded-md font-semibold hover:bg-primary-600 transition duration-300 self-center md:self-start">
                             Showcase Your Expertise
                         </Link>
                     </div>

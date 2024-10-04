@@ -75,7 +75,7 @@ function App() {
 
   return (
     <Router>
-      <div className='mx-3xl flex flex-col items-center'>
+      <div className='mx-xl lg:mx-3xl flex flex-col items-center'>
         <Navbar />
         {showLoginModal && !showRegisterModal && <SigninModal />}
         <div className="flex flex-col min-h-screen">
