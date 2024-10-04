@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ManageListingsSidebar from '../../features/ManageListingsSidebar';
-import EditServiceListingForm from '../../forms/serviceListing/EditServiceListingForm';
-import EditEventListingForm from '../../forms/eventListing/EditEventListingForm';
-import ListingItem from '../../features/ListingItem';
-import LoadingSpinner from '../../reusable/LoadingSpinner';
-import useUserStore from '../../../state/userStore';
+import ManageListingsSidebar from '../../components/features/ManageListingsSidebar';
+import ListingItem from '../../components/features/ListingItem';
+import LoadingSpinner from '../../components/reusable/LoadingSpinner';
+import useUserStore from '../../state/userStore';
 
 const ListingsSection = ({ title, listings, isLoading, isEventListing }) => {
     console.log("isEventListing", isEventListing)

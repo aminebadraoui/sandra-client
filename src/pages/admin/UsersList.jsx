@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useUserStore from '../../../state/userStore';
+import useUserStore from '../../state/userStore';
 
 const UsersList = () => {
     const [users, setUsers] = useState([]);

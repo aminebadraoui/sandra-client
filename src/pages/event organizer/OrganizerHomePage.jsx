@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Carousel from "../../containers/Carousel";
-import CarouselItem from '../../features/ListingItem';
-import Section from '../../containers/Section';
-import ServiceProviderGrid from '../../features/ServiceProviderCard';
+import Carousel from "../../components/containers/Carousel";
+import CarouselItem from '../../components/features/ListingItem';
+import Section from '../../components/containers/Section';
+import ServiceProviderGrid from '../../components/features/ServiceProviderCard';
 
 
 const AllServiceProviders = () => {

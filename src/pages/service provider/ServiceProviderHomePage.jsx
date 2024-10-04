@@ -1,7 +1,7 @@
 import React from 'react';
-import Carousel from "../../containers/Carousel"
-import CarouselItem from '../../features/ListingItem';
-import Section from '../../containers/Section';
+import Carousel from "../../components/containers/Carousel"
+import CarouselItem from '../../components/features/ListingItem';
+import Section from '../../components/containers/Section';
 import { useState, useEffect } from 'react';
 
 

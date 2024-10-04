@@ -89,14 +89,15 @@ const RegisterModal = () => {
     }
 
     const form = (
-        <div className="flex flex-col gap-2">
-            {!roleFromStore && (
-                <div className="w-full flex items-center justify-center m-2">
-                    <RoleSelector onRoleSelect={(role) => setValue("role", role)} />
-                </div>
-            )}
+        <div className="flex flex-col gap-md">
+            <div className="w-full">
+                <RoleSelector
+                    onRoleSelect={(role) => setValue("role", role)}
+                    initialRole={roleFromStore}
+                />
+            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-md">
 
                 <StyledInput
                     {...register("firstName")}

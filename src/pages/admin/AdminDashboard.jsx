@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Sidebar from '../../admin/Sidebar';
+import Sidebar from '../../components/admin/Sidebar';
 import UsersList from './UsersList';
 import ServiceCategories from './ServiceCategories';
 import ReviewListings from './ReviewListings';
