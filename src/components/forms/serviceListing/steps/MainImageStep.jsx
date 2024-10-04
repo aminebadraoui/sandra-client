@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import ImageUpload from '../../../reusable/ImageUpload';
+import ImageUpload from '../../../04.templates/ImageUpload';
 
 const MainImageStep = ({ revisionComments }) => {
     const { setValue, watch } = useFormContext();

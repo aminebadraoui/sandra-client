@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import MultiStepFormLayout from '../MultiStepFormLayout';
+import MultiStepFormLayout from '../../04.templates/MultiStepFormLayout';
 import EventDetailsStep from './steps/EventDetailsStep';
 import ServiceTagsStep from './steps/ServiceTagsStep';
 import ReviewStep from './steps/ReviewStep';

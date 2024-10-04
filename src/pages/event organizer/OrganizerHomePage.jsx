@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Carousel from "../../components/containers/Carousel";
+import Carousel from "../../components/04.templates/Carousel";
 import CarouselItem from '../../components/features/ListingItem';
-import Section from '../../components/containers/Section';
+import Section from '../../components/01.layout/Section';
 import ServiceProviderGrid from '../../components/features/ServiceProviderCard';
 
 

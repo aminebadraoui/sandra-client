@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Modal from '../containers/Modal'
-import StyledInput from "../reusable/StyledInput";
-import StyledButton from "../reusable/StyledButton";
+import Modal from '../03.blocks/Modal'
+import Input from "../02.core/Input";
+import Button from "../02.core/Button";
 import useModalStore from '../../state/modalStore'
 import { useForm } from "react-hook-form";
 import OAuthForm from "./OAuthForm";
@@ -82,19 +82,19 @@ const SigninModal = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
-                <StyledInput
+                <Input
                     {...register("email")}
                     placeholder="Email"
                     errors={errors.email} />
 
-                <StyledInput
+                <Input
                     {...register("password")}
                     placeholder="Password"
                     type="password"
                     errors={errors.password} />
 
                 <div className="m-4">
-                    <StyledButton
+                    <Button
                         title={"Continue"}
                         disabled={isSubmitting}
                         onClick={handleSubmit(onSubmit)} />
@@ -111,7 +111,7 @@ const SigninModal = () => {
             <h1 className="p-4"> Oops, an error occured </h1>
             <p className="p-4">  Sorry, we couldn't process the request at the moment. You can retry filling up the form again. </p>
             <div className="p-4">
-                <StyledButton title={"Retry"} onClick={handleRetry}></StyledButton>
+                <Button title={"Retry"} onClick={handleRetry}></Button>
             </div>
         </div>
 

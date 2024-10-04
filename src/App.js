@@ -1,19 +1,20 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
-import Navbar from './components/features/Navbar';
+import Navbar from './components/03.blocks/Navbar';
 import RegisterModal from './components/features/RegisterModal';
 import SigninModal from './components/features/SigninModal';
 import UserHomePage from './pages/UserHomePage';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from './pages/Admin Dashboard/AdminDashboard';
 import useModalStore from './state/modalStore';
 import useUserStore from './state/userStore';
 import AddServiceListingForm from './components/forms/serviceListing/AddServiceListingForm';
 import ManageListingsPage from './pages/Manage Listing/ManageListingsPage';
 import EditServiceListingForm from './components/forms/serviceListing/EditServiceListingForm';
-import LandingPage from './pages/general/LandingPage';
+import LandingPage from './pages/01.Public/01.Landing Page/LandingPage';
 import ServiceProviderDetailPage from './pages/service provider/ServiceProviderDetailPage'
 import ServiceDetailPage from './pages/service provider/ServiceDetailPage';
+import AppLayout from './components/01.layout/AppLayout';
 
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
@@ -73,7 +74,7 @@ function App() {
 
   return (
     <Router>
-      <div className='mx-3xl flex flex-col items-center'>
+      <AppLayout>
         <Navbar />
         {showLoginModal && !showRegisterModal && <SigninModal />}
         <div className="flex flex-col min-h-screen">
@@ -84,7 +85,7 @@ function App() {
             {renderContent()}
           </div>
         </div>
-      </div>
+      </AppLayout>
 
     </Router>
   );

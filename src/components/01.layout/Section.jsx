@@ -1,5 +1,5 @@
 import React from 'react';
-import StyledButton from '../reusable/StyledButton';
+import Button from '../02.core/Button';
 
 const Section = ({ title, children }) => (
     <section className="mt-8 w-full">
@@ -8,7 +8,7 @@ const Section = ({ title, children }) => (
 
         <div className="flex justify-center mt-12">
             <div className='w-full md:w-1/6'>
-                <StyledButton title="Show More" />
+                <Button title="Show More" />
             </div>
         </div>
     </section>

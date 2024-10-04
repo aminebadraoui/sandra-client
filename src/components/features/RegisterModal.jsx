@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Modal from '../containers/Modal'
-import StyledInput from "../reusable/StyledInput";
-import StyledButton from "../reusable/StyledButton";
+import Modal from '../03.blocks/Modal'
+import Input from "../02.core/Input";
+import Button from "../02.core/Button";
 import useModalStore from '../../state/modalStore'
 import { useForm } from "react-hook-form";
 import OAuthForm from "./OAuthForm";
@@ -99,35 +99,35 @@ const RegisterModal = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-md">
 
-                <StyledInput
+                <Input
                     {...register("firstName")}
                     placeholder="First Name"
                     errors={errors.firstName} />
 
-                <StyledInput
+                <Input
                     {...register("lastName")}
                     placeholder="Last Name"
                     errors={errors.lastName} />
 
-                <StyledInput
+                <Input
                     {...register("email")}
                     placeholder="Email"
                     errors={errors.email} />
 
-                <StyledInput
+                <Input
                     {...register("password")}
                     placeholder="Password"
                     type="password"
                     errors={errors.password} />
 
-                <StyledInput
+                <Input
                     {...register("confirmPassword")}
                     placeholder="Confirm Password"
                     type="password"
                     errors={errors.confirmPassword} />
 
                 <div className="m-4">
-                    <StyledButton
+                    <Button
                         title={"Continue"}
                         disabled={isSubmitting}
                         onClick={handleSubmit(onSubmit)} />
@@ -144,7 +144,7 @@ const RegisterModal = () => {
             <h1 className="p-4"> Oops, an error occured </h1>
             <p className="p-4">  Sorry, we couldn't process the request at the moment. You can retry filling up the form again. </p>
             <div className="p-4">
-                <StyledButton title={"Retry"} onClick={handleRetry}></StyledButton>
+                <Button title={"Retry"} onClick={handleRetry}></Button>
             </div>
         </div>
 
@@ -158,7 +158,7 @@ const RegisterModal = () => {
             </p>
             <p className="p-4"> Still can't find email? No problem.</p>
             <div className="p-4">
-                <StyledButton title={"Resend verification email"} onClick={handleResendVerificationEmail}></StyledButton>
+                <Button title={"Resend verification email"} onClick={handleResendVerificationEmail}></Button>
             </div>
         </div>
     )

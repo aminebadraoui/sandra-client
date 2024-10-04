@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineMenu } from "react-icons/ai";
-import Avatar from "./Avatar";
+import Avatar from "../02.core/Avatar";
 
 import { noSessionMenu, serviceProviderMenu, organizerMenu } from "../../models/Menu";
-import MenuItem from "./MenuItem";
+import MenuItem from "../02.core/MenuItem";
 import useUserStore from "../../state/userStore";
 
 const Menu = () => {

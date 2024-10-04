@@ -1,5 +1,6 @@
+import React from 'react'
 
-const StyledButton = ({
+const Button = ({
     title,
     onClick,
     outline,
@@ -20,4 +21,4 @@ const StyledButton = ({
     </button >
 }
 
-export default StyledButton;
+export default Button;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const StyledInput = React.forwardRef(({ placeholder, type, onChange, errors, ...props }, ref) => {
+const Input = React.forwardRef(({ placeholder, type, onChange, errors, ...props }, ref) => {
     const [hasText, setHasText] = useState(false)
 
 
@@ -35,4 +35,4 @@ const StyledInput = React.forwardRef(({ placeholder, type, onChange, errors, ...
     );
 })
 
-export default StyledInput;
+export default Input;

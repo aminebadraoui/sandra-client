@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import Avatar from "./Avatar";
+import Avatar from "../02.core/Avatar";
 import Menu from "./Menu";
-import Logo from "./Logo";
+import Logo from "../02.core/Logo";
 import useUserStore from "../../state/userStore";
 
 const Navbar = () => {

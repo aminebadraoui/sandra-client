@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ManageListingsSidebar from '../../components/features/ManageListingsSidebar';
 import ListingItem from '../../components/features/ListingItem';
-import LoadingSpinner from '../../components/reusable/LoadingSpinner';
+import LoadingSpinner from '../../components/02.core/LoadingSpinner';
 import useUserStore from '../../state/userStore';
 
 const ListingsSection = ({ title, listings, isLoading, isEventListing }) => {
