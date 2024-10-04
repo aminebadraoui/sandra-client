@@ -3,6 +3,7 @@ import { create } from 'zustand'
 const useModalStore = create((set) => ({
   showLoginModal: false,
   showRegisterModal: false,
+  registerModalRole: null,  // Add this line
 
   closeLoginModal: () => {
     set((state) => {
@@ -22,7 +23,7 @@ const useModalStore = create((set) => ({
 
   closeRegisterModal: () => {
     set((state) => {
-      const newState = { showRegisterModal: false }
+      const newState = { showRegisterModal: false, registerModalRole: null }  // Reset the role when closing
 
       console.log("closeRegisterModal", state)
 
@@ -30,15 +31,13 @@ const useModalStore = create((set) => ({
     })
   },
 
-  openRegisterModal: () => {
+  openRegisterModal: (role) => {
     set((state) => {
-      const newState = { showRegisterModal: true }
+      const newState = { showRegisterModal: true, registerModalRole: role }
 
       return newState
     })
   },
-
-
 }))
 
 export default useModalStore

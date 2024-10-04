@@ -26,7 +26,7 @@ const TagStep = ({ categories, revisionComments }) => {
                             type="button"
                             onClick={() => setValue('tag', tag.id)}
                             className={`p-4 border rounded ${watch('tag') === tag.id
-                                ? 'bg-rose-500 text-white'
+                                ? 'bg-primary-500 text-white'
                                 : 'bg-white'
                                 }`}
                         >

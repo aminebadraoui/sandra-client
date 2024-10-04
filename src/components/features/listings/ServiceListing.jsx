@@ -1,23 +1,23 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import ImageCarousel from '../../containers/ImageCarousel';
 
-const ServiceListing = ({ listing }) => {
+const ServiceListing = ({ service }) => {
     return (
-        <div className="bg-white shadow-lg rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-2">{listing.title}</h2>
-            <p className="text-gray-600 mb-4">{listing.location}</p>
-            <p className="text-gray-700 mb-4">{listing.description}</p>
-            <div className="mb-4">
-                <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mr-2">
-                    {listing.category}
-                </span>
+        <Link to={`/service/${service.id}`} className="block">
+            <div className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-300">
+                <ImageCarousel images={[service.mainImage, ...(service.additionalImages || [])].filter(Boolean)} />
+                <h3 className="text-xl font-bold mb-2 mt-4">{service.title}</h3>
+                <p className="text-gray-600 mb-2">{service.description}</p>
+                <div className="mb-2">
+                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        {service.tag}
+                    </span>
+                </div>
+                <p className="font-semibold mt-2">Starting from ${Math.min(...Object.values(service.pricing))}</p>
+                <p className="text-sm text-gray-500 mt-2">Location: {service.location}</p>
             </div>
-            <div className="mb-4">
-                <p className="font-semibold">Price:</p>
-                {Object.entries(listing.pricing).map(([type, { amount, currency }]) => (
-                    <p key={type}>{`${type} - ${currency} ${amount}`}</p>
-                ))}
-            </div>
-        </div>
+        </Link>
     );
 };
 

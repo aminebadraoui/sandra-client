@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-
+import MultiStepFormLayout from '../MultiStepFormLayout';
 import EventDetailsStep from './steps/EventDetailsStep';
 import ServiceTagsStep from './steps/ServiceTagsStep';
 import ReviewStep from './steps/ReviewStep';
@@ -97,22 +96,9 @@ const AddEventListingForm = () => {
         }
     };
 
-    const goToStep = (step) => {
-        if (step <= furthestStep && step >= 0 && step < steps.length) {
-            setCurrentStep(step);
-        }
-    };
-
-    const renderStep = () => {
-        switch (currentStep) {
-            case 0:
-                return <EventDetailsStep />;
-            case 1:
-                return <ServiceTagsStep categories={categories} />;
-            case 2:
-                return <ReviewStep categories={categories} />;
-            default:
-                return null;
+    const goToStep = (stepIndex) => {
+        if (stepIndex <= furthestStep) {
+            setCurrentStep(stepIndex);
         }
     };
 
@@ -149,62 +135,43 @@ const AddEventListingForm = () => {
 
     return (
         <FormProvider {...methods}>
-            <div className="min-h-screen bg-white flex">
-                {/* Sidebar */}
-                <div className="w-64 bg-gray-100 p-6">
-                    <h2 className="text-xl font-bold mb-4">Submit your event</h2>
-                    <ul>
-                        {steps.map((step, index) => (
-                            <li
-                                key={index}
-                                className={`flex items-center mb-3 ${index <= furthestStep ? 'cursor-pointer' : ''}`}
-                                onClick={() => index <= furthestStep && setCurrentStep(index)}
+            <MultiStepFormLayout
+                steps={steps}
+                currentStep={currentStep}
+                furthestStep={furthestStep}
+                isStepValid={isStepValid}
+                onPrev={handlePrev}
+                onNext={handleNext}
+                onStepClick={goToStep}
+            >
+                <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+                    {currentStep === 0 && <EventDetailsStep />}
+                    {currentStep === 1 && <ServiceTagsStep categories={categories} />}
+                    {currentStep === 2 && <ReviewStep categories={categories} />}
+
+                    <div className="flex justify-between mt-6">
+                        {currentStep > 0 && (
+                            <button
+                                type="button"
+                                onClick={handlePrev}
+                                className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition duration-200"
                             >
-                                <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${index === currentStep ? 'bg-rose-500 text-white' :
-                                    index <= furthestStep ? 'bg-green-500 text-white' : 'bg-gray-300'
-                                    }`}>
-                                    {index < furthestStep ? '✓' : ''}
-                                </div>
-                                <span className={index === currentStep ? 'font-semibold' : ''}>{step}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Main content */}
-                <div className="flex-1 p-10">
-                    {/* Form content */}
-                    <div className="max-w-2xl mx-auto">
-                        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-                            {currentStep === 0 && <EventDetailsStep />}
-                            {currentStep === 1 && <ServiceTagsStep categories={categories} />}
-                            {currentStep === 2 && <ReviewStep categories={categories} />}
-
-                            <div className="flex justify-between mt-6">
-                                {currentStep > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={handlePrev}
-                                        className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition duration-200"
-                                    >
-                                        Previous
-                                    </button>
-                                )}
-                                <button
-                                    type="submit"
-                                    disabled={currentStep === furthestStep && !isStepValid}
-                                    className={`px-6 py-2 rounded ${currentStep === furthestStep && !isStepValid
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        : 'bg-rose-500 text-white hover:bg-rose-600'
-                                        }`}
-                                >
-                                    {currentStep === steps.length - 1 ? 'Submit For Review' : 'Next'}
-                                </button>
-                            </div>
-                        </form>
+                                Previous
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            disabled={currentStep === furthestStep && !isStepValid}
+                            className={`px-6 py-2 rounded ${currentStep === furthestStep && !isStepValid
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-primary-500 text-white hover:bg-rose-600'
+                                }`}
+                        >
+                            {currentStep === steps.length - 1 ? 'Submit For Review' : 'Next'}
+                        </button>
                     </div>
-                </div>
-            </div>
+                </form>
+            </MultiStepFormLayout>
         </FormProvider>
     );
 };

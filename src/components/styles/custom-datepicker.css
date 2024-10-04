@@ -1,0 +1,55 @@
+.rdrMonth {
+    width: 100% !important;
+}
+
+.rdrCalendarWrapper {
+    font-size: 16px !important;
+    width: 100% !important;
+}
+
+.rdrDateDisplayWrapper {
+    background-color: white !important;
+}
+
+.rdrDateDisplay {
+    margin: 0.5rem !important;
+}
+
+.rdrMonthAndYearWrapper {
+    padding-top: 0 !important;
+}
+
+.rdrMonthAndYearPickers select {
+    font-size: 16px !important;
+}
+
+.rdrDay {
+    height: 3em !important;
+    width: 3em !important;
+}
+
+.rdrDayNumber span {
+    color: #1e1e1e !important;
+}
+
+.rdrDayToday .rdrDayNumber span:after {
+    background: #00a699 !important;
+}
+
+.rdrDayToday:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span:after,
+.rdrDayToday:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span:after,
+.rdrDayToday:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span:after,
+.rdrDayToday:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span:after {
+    background: #fff !important;
+}
+
+.rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span {
+    color: white !important;
+}
+
+.rdrSelected, .rdrInRange, .rdrStartEdge, .rdrEndEdge {
+    background: #00a699 !important;
+}

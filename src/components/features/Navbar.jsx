@@ -19,8 +19,8 @@ const Navbar = () => {
     };
 
     return (
-        <div className="bg-white fixed z-50 w-full border-b border-[1px] shadow-md h-[80px] py-2">
-            <div className="flex flex-row justify-between items-center h-full px-4 max-w-7xl mx-auto">
+        <div className="bg-white fixed z-50 w-full h-[80px] flex flex-col justify-center">
+            <div className="flex flex-row justify-between h-full mx-3xl">
                 <Link to="/" className="flex items-center">
                     <Logo />
                 </Link>
@@ -35,7 +35,7 @@ const Navbar = () => {
                             )}
                             <button
                                 onClick={handleToggleRole}
-                                className="text-rose-500 hover:text-blue-800"
+                                className="text-primary-500 hover:text-blue-800"
                             >
                                 {getSwitchRoleText()}
                             </button>

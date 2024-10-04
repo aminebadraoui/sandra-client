@@ -25,7 +25,7 @@ const CategoryStep = ({ categories, revisionComments }) => {
                             setValue('category', category.id);
                         }}
                         className={`p-4 border rounded ${watch('category') === category.id
-                            ? 'bg-rose-500 text-white'
+                            ? 'bg-primary-500 text-white'
                             : 'bg-white'
                             }`}
                     >

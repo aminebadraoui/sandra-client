@@ -35,7 +35,7 @@ const UsersList = () => {
     };
 
     return (
-        <div>
+        <div className='w-full'>
             <h2 className="text-2xl font-bold mb-4">Users</h2>
             <ul className="space-y-2">
                 {users.map(user => (
@@ -44,7 +44,7 @@ const UsersList = () => {
                         {!user.isAdmin && (
                             <button
                                 onClick={() => handleMakeAdmin(user.id)}
-                                className="ml-4 bg-rose-500 text-white px-2 py-1 rounded hover:bg-rose-600"
+                                className="ml-4 bg-primary-500 text-white px-2 py-1 rounded hover:bg-rose-600"
                             >
                                 Make Admin
                             </button>

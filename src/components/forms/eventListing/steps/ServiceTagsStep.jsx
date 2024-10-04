@@ -25,8 +25,8 @@ const ServiceTagsStep = ({ categories }) => {
                                 type="button"
                                 onClick={() => handleTagToggle(tag.id)}
                                 className={`p-4 border rounded ${selectedTagIds.includes(tag.id)
-                                        ? 'bg-rose-500 text-white'
-                                        : 'bg-white'
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-white'
                                     }`}
                             >
                                 {tag.name}

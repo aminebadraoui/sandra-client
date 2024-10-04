@@ -6,7 +6,7 @@ import UserProfileSetup from '../onboarding/UserProfileSetup';
 
 const UserHomePage = () => {
     const { user } = useUserStore();
-    const [isFirstTimeUser, setIsFirstTimeUser] = useState(true); // This should be determined by your backend
+    const [isFirstTimeUser, setIsFirstTimeUser] = useState(false); // This should be determined by your backend
 
     if (!user) {
         return <div>Loading...</div>;
@@ -17,7 +17,7 @@ const UserHomePage = () => {
     }
 
     return (
-        <div className="px-6">
+        <div className="">
             <div className="py-4 flex items-center ">
                 <h1 className="text-8xl font-bold">Welcome, {user.firstName}!</h1>
             </div>

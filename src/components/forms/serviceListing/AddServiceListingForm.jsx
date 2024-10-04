@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-
+import MultiStepFormLayout from '../MultiStepFormLayout';
 import IdeaStep from './steps/IdeaStep';
 import LocationStep from './steps/LocationStep';
 import CategoryStep from './steps/CategoryStep';
@@ -67,45 +66,58 @@ const AddServiceListingForm = () => {
                 setCategories(data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
-                // Set some default categories for now
-                setCategories([
-                    { id: 1, name: 'Category 1', tags: [{ id: 1, name: 'Tag 1' }, { id: 2, name: 'Tag 2' }] },
-                    { id: 2, name: 'Category 2', tags: [{ id: 3, name: 'Tag 3' }, { id: 4, name: 'Tag 4' }] },
-                ]);
+                setCategories([]);
             }
         };
         fetchCategories();
     }, []);
 
-    const validateStep = async () => {
+    const validateStep = () => {
+        const values = methods.getValues();
+        console.log('Validating step:', currentStep);
+        console.log('Current form values:', values);
+
         switch (currentStep) {
             case 0: // Your idea
-                const { title, description } = methods.getValues();
-                setIsStepValid(title.trim() !== '' && description.trim() !== '');
+                const { title, description } = values;
+                const isValid = Boolean(title && description);
+                console.log('Your idea step valid:', isValid);
+                setIsStepValid(isValid);
                 break;
             case 1: // Location
-                setIsStepValid(methods.getValues('location').trim() !== '');
+                const locationValid = Boolean(values.location);
+                console.log('Location step valid:', locationValid);
+                setIsStepValid(locationValid);
                 break;
             case 2: // Category
-                setIsStepValid(methods.getValues('category') !== '');
+                const categoryValid = Boolean(values.category);
+                console.log('Category step valid:', categoryValid);
+                setIsStepValid(categoryValid);
                 break;
             case 3: // Tag
-                setIsStepValid(methods.getValues('tag') !== '');
+                const tagValid = Boolean(values.tag);
+                console.log('Tag step valid:', tagValid);
+                setIsStepValid(tagValid);
                 break;
             case 4: // Pricing Types
-                setIsStepValid(methods.getValues('pricingTypes').length > 0);
+                const pricingTypesValid = values.pricingTypes && values.pricingTypes.length > 0;
+                console.log('Pricing Types step valid:', pricingTypesValid);
+                setIsStepValid(pricingTypesValid);
                 break;
             case 5: // Pricing Details
-                const { pricing, pricingCurrency, pricingTypes } = methods.getValues();
-                setIsStepValid(
-                    pricingCurrency !== '' &&
-                    pricingTypes.every(type => pricing[type]?.amount > 0)
-                );
+                const pricingDetailsValid = values.pricingCurrency && Object.values(values.pricing).every(p => p.amount > 0);
+                console.log('Pricing Details step valid:', pricingDetailsValid);
+                setIsStepValid(pricingDetailsValid);
                 break;
             case 6: // Main image
-                setIsStepValid(methods.getValues('mainImage') !== '');
+                const mainImageValid = Boolean(values.mainImage);
+                console.log('Main image step valid:', mainImageValid);
+                setIsStepValid(mainImageValid);
                 break;
-            case 7: // Additional images (always valid)
+            case 7: // Additional images
+                setIsStepValid(true);
+                break;
+            case 8: // Review
                 setIsStepValid(true);
                 break;
             default:
@@ -113,21 +125,17 @@ const AddServiceListingForm = () => {
         }
     };
 
-    const handleNext = async () => {
-        if (isStepValid) {
-            const nextStep = Math.min(currentStep + 1, steps.length - 1);
-            setCurrentStep(nextStep);
-            setFurthestStep(Math.max(furthestStep, nextStep));
-
-            // If it's the last step, don't automatically submit
-            if (nextStep === steps.length - 1) {
-                return;
-            }
+    const handleNext = () => {
+        if (currentStep < steps.length - 1 && isStepValid) {
+            setCurrentStep(currentStep + 1);
+            setFurthestStep(Math.max(furthestStep, currentStep + 1));
         }
     };
 
     const handlePrev = () => {
-        setCurrentStep((prev) => Math.max(prev - 1, 0));
+        if (currentStep > 0) {
+            setCurrentStep(currentStep - 1);
+        }
     };
 
     const goToStep = (stepIndex) => {
@@ -136,20 +144,7 @@ const AddServiceListingForm = () => {
         }
     };
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form submit triggered");
-        if (currentStep === steps.length - 1) {
-            console.log("Last step reached, attempting submission");
-            onSubmit(methods.getValues());
-        } else {
-            console.log("Moving to next step");
-            handleNext();
-        }
-    };
-
     const onSubmit = async (data) => {
-        console.log("onSubmit function called", data);
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/service-listings`, {
                 method: 'POST',
@@ -157,24 +152,19 @@ const AddServiceListingForm = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({
-                    ...data,
-                    status: 'in_review',
-                    currency: data.pricingCurrency
-                })
+                body: JSON.stringify(data)
             });
 
-            console.log("API response received", response);
-
             if (response.ok) {
-                const result = await response.json();
-                console.log('Listing submitted for review:', result);
-                navigate('/manage-listings/in-review');
+                navigate('/manage-listings');
             } else {
-                console.error('Failed to submit listing');
+                const errorData = await response.json();
+                console.error('Failed to submit service listing:', errorData);
+                // Show an error message to the user here
             }
         } catch (error) {
-            console.error('Error submitting listing:', error);
+            console.error('Error submitting service listing:', error);
+            // Show an error message to the user here
         }
     };
 
@@ -199,84 +189,25 @@ const AddServiceListingForm = () => {
             case 8:
                 return <ReviewStep categories={categories} />;
             default:
-                return (
-                    <div className="space-y-4">
-                        <h2 className="text-2xl font-bold">{steps[currentStep]}</h2>
-                        <p className="text-gray-600">This step is not implemented yet.</p>
-                    </div>
-                );
+                return null;
         }
     };
 
     return (
         <FormProvider {...methods}>
-            <div className="min-h-screen bg-white flex">
-                {/* Sidebar */}
-                <div className="w-64 bg-gray-100 p-6">
-                    <h2 className="text-xl font-bold mb-4">Submit your experience</h2>
-                    <ul>
-                        {steps.map((step, index) => (
-                            <li
-                                key={index}
-                                className={`flex items-center mb-3 ${index <= furthestStep ? 'cursor-pointer' : ''}`}
-                                onClick={() => goToStep(index)}
-                            >
-                                <div className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${index === currentStep ? 'bg-rose-500 text-white' :
-                                    index <= furthestStep ? 'bg-green-500 text-white' : 'bg-gray-300'
-                                    }`}>
-                                    {index < furthestStep ? '✓' : ''}
-                                </div>
-                                <span className={index === currentStep ? 'font-semibold' : ''}>{step}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Main content */}
-                <div className="flex-1 p-10">
-                    {/* Navigation buttons */}
-                    <div className="flex justify-between mb-6">
-                        <button
-                            onClick={handlePrev}
-                            disabled={currentStep === 0}
-                            className={`p-2 rounded-full ${currentStep === 0 ? 'bg-gray-200 text-gray-400' : 'bg-rose-500 text-white'}`}
-                        >
-                            <FaChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            disabled={currentStep === steps.length - 1 || (currentStep === furthestStep && !isStepValid)}
-                            className={`p-2 rounded-full ${currentStep === steps.length - 1 || (currentStep === furthestStep && !isStepValid) ? 'bg-gray-200 text-gray-400' : 'bg-rose-500 text-white'}`}
-                        >
-                            <FaChevronRight className="w-6 h-6" />
-                        </button>
-                    </div>
-
-                    {/* Form content */}
-                    <div className="max-w-2xl mx-auto">
-                        <form onSubmit={handleFormSubmit} className="space-y-6">
-                            {renderStep()}
-                            <div className="flex justify-between mt-6">
-                                {currentStep > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={handlePrev}
-                                        className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition duration-200"
-                                    >
-                                        Previous
-                                    </button>
-                                )}
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 transition duration-200"
-                                >
-                                    {currentStep === steps.length - 1 ? 'Submit For Review' : 'Next'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <MultiStepFormLayout
+                steps={steps}
+                currentStep={currentStep}
+                furthestStep={furthestStep}
+                isStepValid={isStepValid}
+                onPrev={handlePrev}
+                onNext={handleNext}
+                onStepClick={goToStep}
+            >
+                <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+                    {renderStep()}
+                </form>
+            </MultiStepFormLayout>
         </FormProvider>
     );
 };

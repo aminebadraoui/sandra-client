@@ -13,6 +13,10 @@ import ManageListingsPage from './components/pages/Manage Listing/ManageListings
 import EditServiceListingForm from './components/forms/serviceListing/EditServiceListingForm';
 import LandingPage from './components/pages/general/LandingPage';
 import AddEventListingForm from './components/forms/eventListing/AddEventListingForm';
+import EditEventListingForm from './components/forms/eventListing/EditEventListingForm';
+import ServiceProviderDetailPage from './components/pages/service provider/ServiceProviderDetailPage'
+import ServiceDetailPage from './components/pages/service provider/ServiceDetailPage';
+
 function App() {
   const showLoginModal = useModalStore(state => state.showLoginModal)
   const showRegisterModal = useModalStore(state => state.showRegisterModal)
@@ -33,19 +37,28 @@ function App() {
     return (
       <Routes>
         <Route path="/" element={user ? <UserHomePage /> : <LandingPage />} />
-        <Route
-          path="/add-service-listing"
-          element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/add-event-listing"
-          element={user && user.role === "organizer" ? <AddEventListingForm /> : <Navigate to="/" />}
-        />
-        <Route path="/edit-listing/:id" element={<EditServiceListingForm />} />
+
+        { /* Service Listing */}
+
+        {/* Manage Service */}
         <Route
           path="/manage-listings/*"
           element={user ? <ManageListingsPage /> : <Navigate to="/" />}
         />
+
+        {/* Add Service */}
+        <Route
+          path="/add-service-listing"
+          element={user && user.role === "serviceProvider" ? <AddServiceListingForm /> : <Navigate to="/" />}
+        />
+
+        {/* Edit Service */}
+        <Route path="/edit-service-listing/:id" element={<EditServiceListingForm />} />
+
+        <Route path="/service-provider/:id" element={<ServiceProviderDetailPage />} />
+
+        <Route path="/service/:id" element={<ServiceDetailPage />} />
+
         <Route
           path="/account"
           element={user ? <div>Account Page (User: {user.email})</div> : <Navigate to="/" />}
@@ -56,23 +69,25 @@ function App() {
           element={user && user.isAdmin ? <AdminDashboard /> : <Navigate to="/" />}
         />
       </Routes>
+
     );
   };
 
   return (
     <Router>
-      <Navbar />
-      {showLoginModal && !showRegisterModal && <SigninModal />}
-      <div className="flex flex-col min-h-screen">
+      <div className='mx-3xl flex flex-col items-center'>
+        <Navbar />
+        {showLoginModal && !showRegisterModal && <SigninModal />}
+        <div className="flex flex-col min-h-screen">
+          {showRegisterModal && !showLoginModal && <RegisterModal />}
+          {/* {true && <RegisterModal />} */}
 
-
-        {showRegisterModal && !showLoginModal && <RegisterModal />}
-        {/* {true && <RegisterModal />} */}
-
-        <div className="flex-grow container mt-[80px]">
-          {renderContent()}
+          <div className="flex-grow mt-[80px]">
+            {renderContent()}
+          </div>
         </div>
       </div>
+
     </Router>
   );
 }

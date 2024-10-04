@@ -5,7 +5,7 @@ const ListingItem = ({ title, image, description, tag, isServiceListing, childre
     const getStatusColor = (status) => {
         switch (status) {
             case 'active':
-                return 'bg-rose-500';
+                return 'bg-primary-500';
             case 'in_review':
                 return 'bg-yellow-500';
             case 'needs_revision':
@@ -15,10 +15,12 @@ const ListingItem = ({ title, image, description, tag, isServiceListing, childre
         }
     };
 
+    const editPath = isServiceListing ? `/edit-service-listing/${id}` : `/edit-event-listing/${id}`;
+
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
             <div className={`flex justify-end items-center ${getStatusColor(status)}`}>
-                <Link to={`/edit-listing/${id}`} className="px-4 py-2 text-white rounded-md hover:opacity-75 transition duration-300">
+                <Link to={editPath} className="px-4 py-2 text-white rounded-md hover:opacity-75 transition duration-300">
                     Edit
                 </Link>
             </div>

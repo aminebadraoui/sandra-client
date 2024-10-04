@@ -181,9 +181,9 @@ const ServiceCategories = () => {
     };
 
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-4">Service Categories</h2>
-            <div className="mb-4">
+        <div className='w-full flex flex-col'>
+            <h2 className="text-2xl font-bold">Service Categories</h2>
+            <div className="flex flex-row my-md">
                 <input
                     type="text"
                     value={newCategory}
@@ -195,16 +195,16 @@ const ServiceCategories = () => {
                     Add Category
                 </button>
             </div>
-            <ul className="space-y-4">
+            <ul className="my-xs">
                 {categories.map(category => (
-                    <li key={category.id} className="border p-4 rounded">
+                    <li key={category.id} className="border p-4 rounded m-xs">
                         <div className="flex justify-between items-center">
                             {editingCategory === category.id ? (
                                 <input
                                     type="text"
                                     value={editedName}
                                     onChange={(e) => setEditedName(e.target.value)}
-                                    className="border p-2 mr-2"
+                                    className="border p-2 mr-sm"
                                 />
                             ) : (
                                 <h3 className="text-xl font-semibold">{category.name}</h3>

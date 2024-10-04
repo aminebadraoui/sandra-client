@@ -8,6 +8,7 @@ import LoadingSpinner from '../../reusable/LoadingSpinner';
 import useUserStore from '../../../state/userStore';
 
 const ListingsSection = ({ title, listings, isLoading, isEventListing }) => {
+    console.log("isEventListing", isEventListing)
     if (isLoading) {
         return (
             <div className="mt-8">
@@ -102,16 +103,15 @@ const ManageListingsPage = () => {
     };
 
     return (
-        <div className="flex">
+        <div className="">
             <ManageListingsSidebar isEventOrganizer={isEventOrganizer} />
-            <div className="flex-1 p-8">
+            <div className="flex-1 ml-64 p-8">
                 <Routes>
-                    <Route path="published" element={<ListingsSection title="Published Listings" listings={listings.published} isLoading={isLoading} />} />
-                    <Route path="in-review" element={<ListingsSection title="Listings In Review" listings={listings.inReview} isLoading={isLoading} />} />
-                    <Route path="needs-revision" element={<ListingsSection title="Listings Needing Revision" listings={listings.needsRevision} isLoading={isLoading} />} />
-                    <Route path="archived" element={<ListingsSection title="Archived Listings" listings={listings.archived} isLoading={isLoading} />} />
-                    <Route path="drafts" element={<ListingsSection title="Draft Listings" listings={listings.drafts} isLoading={isLoading} />} />
-                    <Route path="/edit-listing/:id" element={isEventOrganizer ? <EditEventListingForm /> : <EditServiceListingForm />} />
+                    <Route path="published" element={<ListingsSection title="Published Listings" listings={listings.published} isLoading={isLoading} isEventListing={isEventOrganizer} />} />
+                    <Route path="in-review" element={<ListingsSection title="Listings In Review" listings={listings.inReview} isLoading={isLoading} isEventListing={isEventOrganizer} />} />
+                    <Route path="needs-revision" element={<ListingsSection title="Listings Needing Revision" listings={listings.needsRevision} isLoading={isLoading} isEventListing={isEventOrganizer} />} />
+                    <Route path="archived" element={<ListingsSection title="Archived Listings" listings={listings.archived} isLoading={isLoading} isEventListing={isEventOrganizer} />} />
+                    <Route path="drafts" element={<ListingsSection title="Draft Listings" listings={listings.drafts} isLoading={isLoading} isEventListing={isEventOrganizer} />} />
                     <Route path="/" element={<Navigate to="published" replace />} />
                 </Routes>
             </div>

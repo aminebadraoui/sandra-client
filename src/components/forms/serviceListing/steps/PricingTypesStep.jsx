@@ -34,7 +34,7 @@ const PricingTypesStep = ({ revisionComments }) => {
                             setValue('pricingTypes', updatedTypes);
                         }}
                         className={`p-4 border rounded ${watch('pricingTypes')?.includes(type.value)
-                            ? 'bg-rose-500 text-white'
+                            ? 'bg-primary-500 text-white'
                             : 'bg-white'
                             }`}
                     >

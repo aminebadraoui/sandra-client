@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from '../containers/Modal'
 import StyledInput from "../reusable/StyledInput";
 import StyledButton from "../reusable/StyledButton";
@@ -9,8 +9,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "../../forms/signupSchema";
 import { capitalizeFirstLetter } from "../utils/stringUtils";
 import RoleSelector from "./RoleSelector";
+import { useLocation } from 'react-router-dom';
 
 const RegisterModal = () => {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const roleFromStore = useModalStore(state => state.registerModalRole);
+
     // Hooks
     const onRegisterModalClose = () => {
         console.log("onRegisterModalClose")
@@ -28,6 +33,13 @@ const RegisterModal = () => {
     const [isError, setIsError] = useState(false)
     const [firstName, setFirstName] = useState("")
     const [email, setEmail] = useState("")
+
+    // Set the role from query param if present
+    useEffect(() => {
+        if (roleFromStore) {
+            setValue("role", roleFromStore);
+        }
+    }, [roleFromStore, setValue]);
 
     console.log(useForm())
 
@@ -78,10 +90,11 @@ const RegisterModal = () => {
 
     const form = (
         <div className="flex flex-col gap-2">
-            <div className="w-full flex items-center justify-center m-2">
-                <RoleSelector onRoleSelect={(role) => setValue("role", role)} />
-            </div>
-
+            {!roleFromStore && (
+                <div className="w-full flex items-center justify-center m-2">
+                    <RoleSelector onRoleSelect={(role) => setValue("role", role)} />
+                </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
@@ -111,8 +124,6 @@ const RegisterModal = () => {
                     placeholder="Confirm Password"
                     type="password"
                     errors={errors.confirmPassword} />
-
-
 
                 <div className="m-4">
                     <StyledButton

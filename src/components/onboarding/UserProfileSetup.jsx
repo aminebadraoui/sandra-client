@@ -60,14 +60,14 @@ const UserProfileSetup = () => {
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                className="px-4 py-2 bg-rose-500 text-white rounded"
+                                className="px-4 py-2 bg-primary-500 text-white rounded"
                             >
                                 Next
                             </button>
                         ) : (
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-rose-500 text-white rounded"
+                                className="px-4 py-2 bg-primary-500 text-white rounded"
                             >
                                 Finish
                             </button>

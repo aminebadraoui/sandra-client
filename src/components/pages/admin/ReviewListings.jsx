@@ -81,7 +81,7 @@ const ReviewListings = () => {
     };
 
     return (
-        <div className="mt-8 container mx-auto">
+        <div className="">
             <h2 className="text-2xl font-semibold mb-4">Service Listings for Review</h2>
             {listings.length === 0 ? (
                 <div className="bg-white shadow rounded-lg p-4">
@@ -91,7 +91,7 @@ const ReviewListings = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-4">
                             {listings.map(listing => (
-                                <div key={listing.id} className={`bg-white shadow rounded-lg p-4 cursor-pointer ${selectedListing?.id === listing.id ? 'border-2 border-rose-500' : ''}`} onClick={() => setSelectedListing(listing)}>
+                                <div key={listing.id} className={`bg-white shadow rounded-lg p-4 cursor-pointer ${selectedListing?.id === listing.id ? 'border-2 border-primary-500' : ''}`} onClick={() => setSelectedListing(listing)}>
                                     <h3 className="text-lg font-semibold">{listing.title}</h3>
                                     <p className="text-gray-600">{listing.description.substring(0, 100)}...</p>
                                     <p className="text-sm text-gray-500 mt-2">Created by: {listing.user.firstName} {listing.user.lastName}</p>
