@@ -183,8 +183,8 @@ const LandingPage = () => {
                     ))}
                 </div>
                 <div className="text-center mt-xl">
-                    <button onClick={() => openRegisterModal(null)} className="bg-primary-500 text-white px-xl py-md rounded-md font-semibold hover:bg-primary-600 transition duration-300">
-                        Get Started to See More
+                    <button onClick={() => openRegisterModal(null)} className="bg-primary text-white px-xl py-md rounded-md font-semibold hover:bg-primary-600 transition duration-300">
+                        See More
                     </button>
                 </div>
             </section>
